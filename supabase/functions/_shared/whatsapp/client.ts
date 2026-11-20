@@ -1,5 +1,5 @@
 // Cliente de la Graph API de WhatsApp Cloud. Un cliente por comercio (token propio, leído de Vault).
-import { GRAPH_BASE } from "./constants.ts";
+import { graphBase } from "./constants.ts";
 
 export type FetchFn = typeof fetch;
 
@@ -106,6 +106,8 @@ export interface ClientOptions {
   phoneNumberId?: string;
   fetch?: FetchFn;
   baseUrl?: string;
+  /** Versión de la Graph API (ajuste meta.graph_version). Se ignora si hay baseUrl. */
+  graphVersion?: string;
 }
 
 export class WhatsAppClient {
@@ -113,7 +115,7 @@ export class WhatsAppClient {
   private readonly base: string;
   constructor(private readonly opts: ClientOptions) {
     this.f = opts.fetch ?? fetch;
-    this.base = opts.baseUrl ?? GRAPH_BASE;
+    this.base = opts.baseUrl ?? graphBase(opts.graphVersion);
   }
 
   private async request<T>(method: string, path: string, body?: unknown): Promise<T> {

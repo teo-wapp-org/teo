@@ -12,8 +12,13 @@ export interface Account { account_id: string; org_id: string }
 export interface IngestResult { message_id: string; conversation_id: string; case_id: string | null; org_id: string; inserted: boolean }
 
 export interface WebhookDeps {
+  /** Valores fijos (tests). En producción se usan `secrets()` y `debounceSeconds()` (config de la plataforma). */
   appSecret: string;
   verifyToken: string;
+  /** Secretos vigentes: meta_app_secret y whatsapp_verify_token de Vault (respaldo env). */
+  secrets?(): Promise<{ appSecret: string; verifyToken: string }>;
+  /** Debounce vigente antes de que el agente responda (ai.debounce_seconds). */
+  debounceSeconds?(): Promise<number>;
   resolveAccount(phoneNumberId: string): Promise<Account | null>;
   ingest(a: {
     accountId: string;
@@ -96,9 +101,12 @@ export async function processPayload(payload: WebhookPayload, deps: WebhookDeps)
     }
   }
 
+  const delay = toEnqueue.size && deps.debounceSeconds
+    ? await deps.debounceSeconds().catch(() => INBOUND_DEBOUNCE_SECONDS)
+    : INBOUND_DEBOUNCE_SECONDS;
   for (const [conversationId, orgId] of toEnqueue) {
     try {
-      await deps.enqueue(orgId, conversationId, INBOUND_DEBOUNCE_SECONDS);
+      await deps.enqueue(orgId, conversationId, delay);
       sum.enqueued++;
     } catch (e) {
       sum.errors++;
@@ -145,14 +153,20 @@ async function storeMedia(
   }
 }
 
+async function currentSecrets(deps: WebhookDeps) {
+  if (!deps.secrets) return { appSecret: deps.appSecret, verifyToken: deps.verifyToken };
+  return await deps.secrets();
+}
+
 export async function handleRequest(req: Request, deps: WebhookDeps): Promise<Response> {
   const url = new URL(req.url);
 
   if (req.method === "GET") {
+    const { verifyToken } = await currentSecrets(deps);
     const mode = url.searchParams.get("hub.mode");
     const token = url.searchParams.get("hub.verify_token") ?? "";
     const challenge = url.searchParams.get("hub.challenge") ?? "";
-    if (mode === "subscribe" && deps.verifyToken && timingSafeEqual(token, deps.verifyToken)) {
+    if (mode === "subscribe" && verifyToken && timingSafeEqual(token, verifyToken)) {
       return new Response(challenge, { status: 200, headers: { "Content-Type": "text/plain" } });
     }
     deps.log("warn", "wa_verify_rechazado", { mode });
@@ -162,7 +176,9 @@ export async function handleRequest(req: Request, deps: WebhookDeps): Promise<Re
   if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
   const raw = new Uint8Array(await req.arrayBuffer());
-  if (!(await verifySignature(raw, req.headers.get("x-hub-signature-256"), deps.appSecret))) {
+  const { appSecret } = await currentSecrets(deps);
+  if (!appSecret) deps.log("error", "wa_config_incompleta", { appSecret: false });
+  if (!(await verifySignature(raw, req.headers.get("x-hub-signature-256"), appSecret))) {
     deps.log("warn", "wa_firma_invalida", {});
     return new Response(JSON.stringify({ error: "invalid_signature" }), { status: 401, headers: { "Content-Type": "application/json" } });
   }

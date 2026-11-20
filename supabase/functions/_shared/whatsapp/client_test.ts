@@ -114,3 +114,13 @@ Deno.test("media: GET /{media_id} y descarga con el token", async () => {
   assertEquals(mime, "image/jpeg");
   assertEquals(calls, [`${GRAPH_BASE}/MEDIA1 Bearer TK`, "https://lookaside.fbsbx.com/x Bearer TK"]);
 });
+
+Deno.test("graphVersion: la versión de la Graph API sale de la config", async () => {
+  const calls: string[] = [];
+  const f = ((url: string) => {
+    calls.push(String(url));
+    return Promise.resolve(new Response(JSON.stringify({ messages: [{ id: "wamid.X" }] })));
+  }) as unknown as typeof fetch;
+  await new WhatsAppClient({ token: "t", phoneNumberId: "111", fetch: f, graphVersion: "v99.0" }).sendText("5939", "hola");
+  assertEquals(calls[0], "https://graph.facebook.com/v99.0/111/messages");
+});

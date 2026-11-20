@@ -1,6 +1,7 @@
 // Edge Function whatsapp-send (verify_jwt = false: la llama pg_net con el secreto x-teo-send-secret leído de Vault).
 // URL: https://<ref>.supabase.co/functions/v1/whatsapp-send
 // Secrets: WHATSAPP_SEND_SECRET (= Vault whatsapp_send_secret) + SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY automáticos.
+import { loadPlatformConfig } from "../_shared/config.ts";
 import { MAX_SEND_ATTEMPTS } from "../_shared/whatsapp/constants.ts";
 import type { OutboundRow } from "../_shared/whatsapp/outbound.ts";
 import { log, serviceClient, waitUntil } from "../_shared/runtime.ts";
@@ -53,6 +54,9 @@ const deps: SendDeps = {
     } else {
       must(await db.from("messages").update({ send_claimed_at: null }).eq("id", id));
     }
+  },
+  async graphVersion() {
+    return (await loadPlatformConfig(db)).meta.graphVersion;
   },
   now: () => new Date(),
   waitUntil,
