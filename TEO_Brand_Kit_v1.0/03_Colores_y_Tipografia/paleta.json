@@ -1,0 +1,38 @@
+[
+  {
+    "nombre": "Azul Teo",
+    "hex": "#0B1F3A",
+    "uso": "Principal. Confianza y tecnología.",
+    "origen": "HEX transcrito del manual, no muestreado"
+  },
+  {
+    "nombre": "Verde Inteligente",
+    "hex": "#00D97E",
+    "uso": "Acciones, crecimiento y ventas.",
+    "origen": "HEX transcrito del manual, no muestreado"
+  },
+  {
+    "nombre": "Lila de Acento",
+    "hex": "#D9D6FF",
+    "uso": "Apoyo en fondos y elementos de interfaz.",
+    "origen": "HEX transcrito del manual, no muestreado"
+  },
+  {
+    "nombre": "Blanco Nube",
+    "hex": "#F5F8FC",
+    "uso": "Fondos, superficies y claridad.",
+    "origen": "HEX transcrito del manual, no muestreado"
+  },
+  {
+    "nombre": "Blanco",
+    "hex": "#FFFFFF",
+    "uso": "Contraste y limpieza.",
+    "origen": "HEX transcrito del manual, no muestreado"
+  },
+  {
+    "nombre": "Gris Interfaz",
+    "hex": "#64748B",
+    "uso": "Textos secundarios, bordes y estados.",
+    "origen": "HEX transcrito del manual, no muestreado"
+  }
+]

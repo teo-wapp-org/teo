@@ -1,0 +1,724 @@
+{
+  "version": "1.0",
+  "fuente": "Teo Brand Identity Manual Dashboard.png",
+  "fuente_sha256": "28325bb4f2a7bf70d2d32598b80cce30980b25a49c9c5a47e0d0408accc41779",
+  "dimensiones_fuente": [
+    1536,
+    1024
+  ],
+  "coordenadas": "x0,y0,x1,y1; origen arriba-izquierda; límite superior exclusivo",
+  "recursos": [
+    {
+      "archivo": "01_Logos/Raster_original/logo_principal_horizontal_claro.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        88,
+        315,
+        389,
+        450
+      ],
+      "ancho": 301,
+      "alto": 135,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "01_Logos/Raster_original/logo_principal_horizontal_oscuro.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        93,
+        22,
+        426,
+        178
+      ],
+      "ancho": 333,
+      "alto": 156,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "01_Logos/Raster_original/isotipo.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        98,
+        498,
+        168,
+        558
+      ],
+      "ancho": 70,
+      "alto": 60,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "01_Logos/Raster_original/logotipo.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        292,
+        509,
+        371,
+        552
+      ],
+      "ancho": 79,
+      "alto": 43,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "01_Logos/Raster_original/version_sobre_claro.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        78,
+        666,
+        205,
+        718
+      ],
+      "ancho": 127,
+      "alto": 52,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "01_Logos/Raster_original/version_sobre_oscuro.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        233,
+        666,
+        361,
+        718
+      ],
+      "ancho": 128,
+      "alto": 52,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "01_Logos/Raster_original/version_sobre_verde.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        389,
+        666,
+        516,
+        718
+      ],
+      "ancho": 127,
+      "alto": 52,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "02_Identidad_de_Marca/Raster_original/la_marca.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        475,
+        21,
+        978,
+        190
+      ],
+      "ancho": 503,
+      "alto": 169,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "02_Identidad_de_Marca/Raster_original/proposito.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        991,
+        21,
+        1248,
+        190
+      ],
+      "ancho": 257,
+      "alto": 169,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "02_Identidad_de_Marca/Raster_original/personalidad.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        1260,
+        21,
+        1517,
+        190
+      ],
+      "ancho": 257,
+      "alto": 169,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "03_Colores_y_Tipografia/Raster_original/paleta_original.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        838,
+        215,
+        1151,
+        595
+      ],
+      "ancho": 313,
+      "alto": 380,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "03_Colores_y_Tipografia/Raster_original/tipografia_original.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        1160,
+        215,
+        1526,
+        595
+      ],
+      "ancho": 366,
+      "alto": 380,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/sistema_iconografico.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        541,
+        863,
+        854,
+        1017
+      ],
+      "ancho": 313,
+      "alto": 154,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "06_Recursos_Graficos/Raster_original/recursos_originales.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        15,
+        863,
+        526,
+        1017
+      ],
+      "ancho": 511,
+      "alto": 154,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "07_Aplicaciones/Raster_original/aplicaciones_originales.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        559,
+        611,
+        1523,
+        852
+      ],
+      "ancho": 964,
+      "alto": 241,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "08_Manual_de_Marca/Raster_original/construccion_y_proteccion.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        458,
+        215,
+        828,
+        404
+      ],
+      "ancho": 370,
+      "alto": 189,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "08_Manual_de_Marca/Raster_original/tamanos_minimos.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        458,
+        416,
+        828,
+        594
+      ],
+      "ancho": 370,
+      "alto": 178,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "08_Manual_de_Marca/Raster_original/usos_correctos_e_incorrectos.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        14,
+        611,
+        543,
+        852
+      ],
+      "ancho": 529,
+      "alto": 241,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "08_Manual_de_Marca/Raster_original/voz_y_tono.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        867,
+        863,
+        1536,
+        1024
+      ],
+      "ancho": 669,
+      "alto": 161,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "05_Personaje_Teo/Raster_original/personaje_principal.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        95,
+        23,
+        247,
+        178
+      ],
+      "ancho": 152,
+      "alto": 155,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "05_Personaje_Teo/Raster_original/personaje_logo_claro.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        95,
+        315,
+        227,
+        450
+      ],
+      "ancho": 132,
+      "alto": 135,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "05_Personaje_Teo/Raster_original/personaje_saludo_composicion.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        1062,
+        863,
+        1536,
+        1024
+      ],
+      "ancho": 474,
+      "alto": 161,
+      "fondo": "conservado del manual",
+      "nota": "El personaje ya aparece cortado por el borde inferior del manual; incluye fondo y globo originales."
+    },
+    {
+      "archivo": "07_Aplicaciones/Raster_original/dashboard.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        581,
+        648,
+        818,
+        792
+      ],
+      "ancho": 237,
+      "alto": 144,
+      "fondo": "conservado del manual",
+      "nota": "Muestra raster del manual; no es plantilla editable ni archivo de impresión."
+    },
+    {
+      "archivo": "07_Aplicaciones/Raster_original/web_landing.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        838,
+        648,
+        1071,
+        792
+      ],
+      "ancho": 233,
+      "alto": 144,
+      "fondo": "conservado del manual",
+      "nota": "Muestra raster del manual; no es plantilla editable ni archivo de impresión."
+    },
+    {
+      "archivo": "07_Aplicaciones/Raster_original/redes_sociales.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        1099,
+        647,
+        1295,
+        792
+      ],
+      "ancho": 196,
+      "alto": 145,
+      "fondo": "conservado del manual",
+      "nota": "Muestra raster del manual; no es plantilla editable ni archivo de impresión."
+    },
+    {
+      "archivo": "07_Aplicaciones/Raster_original/material_comercial.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        1321,
+        646,
+        1505,
+        792
+      ],
+      "ancho": 184,
+      "alto": 146,
+      "fondo": "conservado del manual",
+      "nota": "Muestra raster del manual; no es plantilla editable ni archivo de impresión."
+    },
+    {
+      "archivo": "06_Recursos_Graficos/Raster_original/fondo_verde.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        44,
+        916,
+        132,
+        1001
+      ],
+      "ancho": 88,
+      "alto": 85,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "06_Recursos_Graficos/Raster_original/fondo_lila.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        141,
+        916,
+        228,
+        1001
+      ],
+      "ancho": 87,
+      "alto": 85,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "06_Recursos_Graficos/Raster_original/patron_lineas.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        237,
+        916,
+        325,
+        1001
+      ],
+      "ancho": 88,
+      "alto": 85,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "06_Recursos_Graficos/Raster_original/forma_verde.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        351,
+        917,
+        405,
+        963
+      ],
+      "ancho": 54,
+      "alto": 46,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "06_Recursos_Graficos/Raster_original/forma_lila.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        414,
+        917,
+        464,
+        962
+      ],
+      "ancho": 50,
+      "alto": 45,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "06_Recursos_Graficos/Raster_original/cuarto_circulo.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        475,
+        917,
+        515,
+        962
+      ],
+      "ancho": 40,
+      "alto": 45,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "06_Recursos_Graficos/Raster_original/boton_flecha.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        397,
+        968,
+        474,
+        1002
+      ],
+      "ancho": 77,
+      "alto": 34,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/conversaciones.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        571,
+        898,
+        602,
+        926
+      ],
+      "ancho": 31,
+      "alto": 28,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Vectores_recreados/conversaciones_trazado.svg",
+      "tipo": "vector_recreado_por_trazado_raster",
+      "caja_xyxy": [
+        571,
+        898,
+        602,
+        926
+      ],
+      "nota": "Umbral RGB mínimo 170; silueta escalonada de píxeles, sin suavizado ni rediseño. Usar en blanco sobre oscuro."
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/clientes.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        628,
+        898,
+        660,
+        927
+      ],
+      "ancho": 32,
+      "alto": 29,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Vectores_recreados/clientes_trazado.svg",
+      "tipo": "vector_recreado_por_trazado_raster",
+      "caja_xyxy": [
+        628,
+        898,
+        660,
+        927
+      ],
+      "nota": "Umbral RGB mínimo 170; silueta escalonada de píxeles, sin suavizado ni rediseño. Usar en blanco sobre oscuro."
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/estados_capas.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        684,
+        898,
+        717,
+        927
+      ],
+      "ancho": 33,
+      "alto": 29,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Vectores_recreados/estados_capas_trazado.svg",
+      "tipo": "vector_recreado_por_trazado_raster",
+      "caja_xyxy": [
+        684,
+        898,
+        717,
+        927
+      ],
+      "nota": "Umbral RGB mínimo 170; silueta escalonada de píxeles, sin suavizado ni rediseño. Usar en blanco sobre oscuro."
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/filtro_ventas.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        741,
+        898,
+        773,
+        927
+      ],
+      "ancho": 32,
+      "alto": 29,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Vectores_recreados/filtro_ventas_trazado.svg",
+      "tipo": "vector_recreado_por_trazado_raster",
+      "caja_xyxy": [
+        741,
+        898,
+        773,
+        927
+      ],
+      "nota": "Umbral RGB mínimo 170; silueta escalonada de píxeles, sin suavizado ni rediseño. Usar en blanco sobre oscuro."
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/estadisticas.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        797,
+        898,
+        830,
+        927
+      ],
+      "ancho": 33,
+      "alto": 29,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Vectores_recreados/estadisticas_trazado.svg",
+      "tipo": "vector_recreado_por_trazado_raster",
+      "caja_xyxy": [
+        797,
+        898,
+        830,
+        927
+      ],
+      "nota": "Umbral RGB mínimo 170; silueta escalonada de píxeles, sin suavizado ni rediseño. Usar en blanco sobre oscuro."
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/etiqueta.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        571,
+        938,
+        603,
+        969
+      ],
+      "ancho": 32,
+      "alto": 31,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Vectores_recreados/etiqueta_trazado.svg",
+      "tipo": "vector_recreado_por_trazado_raster",
+      "caja_xyxy": [
+        571,
+        938,
+        603,
+        969
+      ],
+      "nota": "Umbral RGB mínimo 170; silueta escalonada de píxeles, sin suavizado ni rediseño. Usar en blanco sobre oscuro."
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/calendario.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        628,
+        938,
+        660,
+        969
+      ],
+      "ancho": 32,
+      "alto": 31,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Vectores_recreados/calendario_trazado.svg",
+      "tipo": "vector_recreado_por_trazado_raster",
+      "caja_xyxy": [
+        628,
+        938,
+        660,
+        969
+      ],
+      "nota": "Umbral RGB mínimo 170; silueta escalonada de píxeles, sin suavizado ni rediseño. Usar en blanco sobre oscuro."
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/estado_completado.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        684,
+        938,
+        717,
+        969
+      ],
+      "ancho": 33,
+      "alto": 31,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Vectores_recreados/estado_completado_trazado.svg",
+      "tipo": "vector_recreado_por_trazado_raster",
+      "caja_xyxy": [
+        684,
+        938,
+        717,
+        969
+      ],
+      "nota": "Umbral RGB mínimo 170; silueta escalonada de píxeles, sin suavizado ni rediseño. Usar en blanco sobre oscuro."
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/automatizacion.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        741,
+        938,
+        773,
+        969
+      ],
+      "ancho": 32,
+      "alto": 31,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Vectores_recreados/automatizacion_trazado.svg",
+      "tipo": "vector_recreado_por_trazado_raster",
+      "caja_xyxy": [
+        741,
+        938,
+        773,
+        969
+      ],
+      "nota": "Umbral RGB mínimo 170; silueta escalonada de píxeles, sin suavizado ni rediseño. Usar en blanco sobre oscuro."
+    },
+    {
+      "archivo": "04_Iconografia/Raster_original/configuracion.png",
+      "tipo": "recorte_raster_original",
+      "caja_xyxy": [
+        797,
+        938,
+        830,
+        969
+      ],
+      "ancho": 33,
+      "alto": 31,
+      "fondo": "conservado del manual",
+      "nota": ""
+    },
+    {
+      "archivo": "04_Iconografia/Vectores_recreados/configuracion_trazado.svg",
+      "tipo": "vector_recreado_por_trazado_raster",
+      "caja_xyxy": [
+        797,
+        938,
+        830,
+        969
+      ],
+      "nota": "Umbral RGB mínimo 170; silueta escalonada de píxeles, sin suavizado ni rediseño. Usar en blanco sobre oscuro."
+    }
+  ]
+}

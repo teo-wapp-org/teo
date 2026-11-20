@@ -1,0 +1,10 @@
+.ref/
+.env
+.env.*
+!.env.example
+node_modules/
+.DS_Store
+web/.next/
+web/node_modules/
+supabase/.temp/
+supabase/.branches/
