@@ -6,7 +6,7 @@ import { defineConfig, devices } from "@playwright/test";
  * - Sin E2E_BASE_URL → levanta `next start` local (requiere `npm run build`).
  */
 const external = process.env.E2E_BASE_URL;
-const port = 3123;
+const port = Number(process.env.E2E_PORT ?? 3123); // cada agente/worktree usa su propio puerto
 
 export default defineConfig({
   testDir: "./e2e",
