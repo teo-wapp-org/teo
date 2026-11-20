@@ -394,3 +394,15 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 # declarative_schema_path = "./declarative"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# ── Edge Functions del agente ──
+[functions.agent]
+enabled = true
+verify_jwt = true
+import_map = "./functions/agent/deno.json"
+
+[functions.agent-runner]
+enabled = true
+# protegida con x-teo-cron-secret (pg_cron + Vault)
+verify_jwt = false
+import_map = "./functions/agent-runner/deno.json"
