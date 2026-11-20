@@ -16,7 +16,7 @@ export async function createOrganization(_: OnboardingState, formData: FormData)
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("create_organization", { p_name: parsed.data.name, p_rubro: parsed.data.rubro ?? null });
+  const { data, error } = await supabase.rpc("create_organization", { p_name: parsed.data.name, p_rubro: parsed.data.rubro || undefined });
   if (error || !data) return { error: "No pudimos crear tu comercio. Inténtalo de nuevo." };
   redirect(`/app/${(data as { slug: string }).slug}`);
 }
