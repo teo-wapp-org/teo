@@ -1,26 +1,25 @@
-// Selección del proveedor por entorno:
-//   TEO_LLM_PROVIDER = anthropic | fake
-//   por defecto: anthropic si existe ANTHROPIC_API_KEY, si no fake.
-// Opcionales: TEO_AGENT_MODEL, TEO_CHEAP_MODEL, TEO_LLM_EFFORT (low|medium|high).
+// Selección del proveedor LLM a partir de la configuración de la plataforma (ajuste `ai` en la DB
+// y secreto `anthropic_api_key` en Vault; ver _shared/config.ts). Si el ajuste pide Anthropic pero
+// no hay key, se usa el FakeProvider y se devuelve el error para registrarlo en agent_runs.
+import type { AiSettings } from "../config.ts";
 import { AnthropicProvider } from "./anthropic.ts";
 import { FakeProvider } from "./fake.ts";
 import type { LlmProvider } from "./types.ts";
 
-type Env = { get(k: string): string | undefined };
+export type ProviderSelection = { llm: LlmProvider; error: string | null };
 
-export function selectProvider(env: Env = Deno.env): LlmProvider {
-  const apiKey = env.get("ANTHROPIC_API_KEY");
-  const wanted = (env.get("TEO_LLM_PROVIDER") ?? (apiKey ? "anthropic" : "fake")).toLowerCase();
-  if (wanted === "anthropic") {
-    if (!apiKey) throw new Error("TEO_LLM_PROVIDER=anthropic requiere ANTHROPIC_API_KEY");
-    const effort = env.get("TEO_LLM_EFFORT") as "low" | "medium" | "high" | undefined;
-    return new AnthropicProvider({
-      apiKey,
-      agentModel: env.get("TEO_AGENT_MODEL"),
-      cheapModel: env.get("TEO_CHEAP_MODEL"),
-      effort,
-    });
+export function createProvider(ai: AiSettings, anthropicApiKey: string | null): ProviderSelection {
+  if (ai.provider === "anthropic") {
+    if (!anthropicApiKey) return { llm: new FakeProvider(), error: "anthropic_key_missing" };
+    return {
+      llm: new AnthropicProvider({
+        apiKey: anthropicApiKey,
+        agentModel: ai.agentModel,
+        cheapModel: ai.cheapModel,
+        effort: ai.effort,
+      }),
+      error: null,
+    };
   }
-  if (wanted === "fake") return new FakeProvider();
-  throw new Error(`TEO_LLM_PROVIDER desconocido: ${wanted}`);
+  return { llm: new FakeProvider(), error: null };
 }

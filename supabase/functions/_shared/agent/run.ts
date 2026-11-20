@@ -6,9 +6,10 @@
 // 1. Carga conversación y contacto (filtrando por org), abre caso si no hay uno abierto y le asigna
 //    los mensajes entrantes sueltos.
 // 2. Si no hay mensajes nuevos del cliente → no hace nada.
-// 3. Si la conversación está en modo humano, el agente está desactivado, el comercio está en
-//    copiloto o el cupo del plan se agotó → NO responde: genera sugerencias y retorna sin replies.
-// 4. Loop de herramientas (máx. 6 iteraciones, timeout total). Errores repetidos, refusal o
+// 3. Si la conversación está en modo humano, la IA está pausada globalmente (ai.enabled=false →
+//    "ia_pausada"), el agente está desactivado, el comercio está en copiloto o el cupo del plan se
+//    agotó → NO responde: genera sugerencias y retorna sin replies.
+// 4. Loop de herramientas (máx. ai.max_tool_iterations iteraciones, timeout total ai.timeout_ms). Errores repetidos, refusal o
 //    exceso de iteraciones → escala a humano con un mensaje de cortesía.
 // 5. Guarda las respuestas en messages (queued si WhatsApp, sent si simulador), registra agent_runs
 //    e incrementa el uso (increment_teo_usage; el simulador no consume cupo).
@@ -18,6 +19,7 @@ import { loadCaseState, loadOrgContext, quotaStatus } from "./context.ts";
 import { buildHistory, buildOrgContext, buildVolatile, systemBlocks } from "./prompt.ts";
 import { generateSuggestions, loadCaseHistory } from "./suggest.ts";
 import { sanitizeReply, unknownAmounts } from "./text.ts";
+import { resolveAgentDeps } from "./runtime.ts";
 import { executeTool, TOOL_DEFS } from "./tools.ts";
 import {
   type AgentDeps, type AgentTurnResult, type Channel, DEFAULT_TURN_TIMEOUT_MS, MAX_TOOL_ITERATIONS,
@@ -28,9 +30,10 @@ export const HANDOFF_TEXT = "Gracias por escribirnos. Una persona del equipo te 
 export const PRICE_GUARD_TEXT = "Déjame confirmar ese dato con el equipo y te escribimos en un momento.";
 
 export async function runAgentTurn(
-  deps: AgentDeps,
+  baseDeps: AgentDeps,
   input: { orgId: string; conversationId: string },
 ): Promise<AgentTurnResult> {
+  const deps = await resolveAgentDeps(baseDeps);
   const { db } = deps;
   const { orgId, conversationId } = input;
   const t0 = Date.now();
@@ -62,6 +65,7 @@ export async function runAgentTurn(
   let skip: SkipReason | null = null;
   if (ctx.org.status === "suspendido") skip = "suspendido";
   else if (conv.handled_by === "humano") skip = "humano";
+  else if (deps.aiEnabled === false) skip = "ia_pausada";
   else if (!ctx.settings.enabled) skip = "desactivado";
   else if (ctx.settings.mode === "copiloto") skip = "copiloto";
   else if ((await quotaStatus(db, orgId)).exhausted) skip = "cupo_agotado";
@@ -109,7 +113,7 @@ export async function runAgentTurn(
     let iterations = 0;
     while (true) {
       if (abort.signal.aborted) { error = "timeout"; break; }
-      if (iterations >= MAX_TOOL_ITERATIONS) { error = "max_iterations"; break; }
+      if (iterations >= (deps.maxToolIterations ?? MAX_TOOL_ITERATIONS)) { error = "max_iterations"; break; }
       let res;
       try {
         res = await deps.llm.complete({ task: "agent", system, tools: TOOL_DEFS, messages: convo }, { signal: abort.signal });
@@ -206,7 +210,8 @@ export async function runAgentTurn(
     org_id: orgId, case_id: caseRow.id, kind: "reply", model,
     input_tokens: usage.inputTokens, output_tokens: usage.outputTokens,
     cache_read_tokens: usage.cacheReadTokens, cache_write_tokens: usage.cacheWriteTokens,
-    latency_ms: Date.now() - t0, tools: toolLog, stop_reason: stopReason || null, error,
+    latency_ms: Date.now() - t0, tools: toolLog, stop_reason: stopReason || null,
+    error: error ?? (deps.configError ? `config: ${deps.configError}` : null),
   });
 
   return { replies, caseId: caseRow.id, handledBy, usage };

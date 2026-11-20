@@ -1,5 +1,6 @@
 // Tests de integración del turno del agente contra teo-dev (datos QA que se borran al final).
 import { assert, assertEquals, assertStringIncludes } from "@std/assert";
+import { FakeProvider } from "../llm/fake.ts";
 import type { LlmToolResultBlock } from "../llm/types.ts";
 import { PRICE_GUARD_TEXT, runAgentTurn } from "./run.ts";
 import { generateSuggestions } from "./suggest.ts";
@@ -223,6 +224,48 @@ dbTest("errores repetidos del LLM → escala a humano con mensaje de cortesía",
     assertEquals((await caseOf(db, r.caseId)).status, "requiere_atencion");
     const { data: run } = await db.from("agent_runs").select("error").eq("org_id", org.id).single();
     assertStringIncludes(run!.error, "llm_error");
+  } finally {
+    await deleteOrg(db, org.id);
+  }
+});
+
+dbTest("config de plataforma: IA pausada globalmente → no responde, solo sugiere (ia_pausada)", async (db) => {
+  const org = await createQaOrg(db);
+  try {
+    const { conversationId } = await inbound(db, org.id, "hola, tienen torta?");
+    const r = await runAgentTurn({ ...deps(db), runtime: () => Promise.resolve({ llm: new FakeProvider(), aiEnabled: false }) }, { orgId: org.id, conversationId });
+    assertEquals(r.skipped, "ia_pausada");
+    assertEquals(r.replies.length, 0);
+    const { count } = await db.from("ai_suggestions").select("id", { count: "exact", head: true }).eq("case_id", r.caseId);
+    assert((count ?? 0) >= 1);
+  } finally {
+    await deleteOrg(db, org.id);
+  }
+});
+
+dbTest("config de plataforma: max_tool_iterations y error de config quedan en agent_runs", async (db) => {
+  const org = await createQaOrg(db);
+  try {
+    const loop = () => [{ type: "tool_use" as const, id: crypto.randomUUID(), name: "buscar_productos", input: { query: "x", categoria: null, precio_max: null } }];
+    const llm = new ScriptedProvider([loop, loop, loop]);
+    const { conversationId } = await inbound(db, org.id, "hola");
+    const r = await runAgentTurn(
+      { ...deps(db), runtime: () => Promise.resolve({ llm, maxToolIterations: 2, configError: "anthropic_key_missing" }) },
+      { orgId: org.id, conversationId },
+    );
+    assertEquals(llm.calls.length, 2);
+    assertEquals(r.handledBy, "humano");
+    const { data: run } = await db.from("agent_runs").select("error").eq("org_id", org.id).eq("kind", "reply").single();
+    assertEquals(run!.error, "max_iterations");
+
+    // sin error del turno, el error de configuración se registra igual
+    const sim = await inbound(db, org.id, "hola de nuevo", "593990000002", "simulador");
+    await runAgentTurn(
+      { ...deps(db), runtime: () => Promise.resolve({ llm: new FakeProvider(), configError: "anthropic_key_missing" }) },
+      { orgId: org.id, conversationId: sim.conversationId },
+    );
+    const { data: runs } = await db.from("agent_runs").select("error").eq("org_id", org.id).eq("kind", "reply").eq("error", "config: anthropic_key_missing");
+    assertEquals(runs!.length, 1);
   } finally {
     await deleteOrg(db, org.id);
   }

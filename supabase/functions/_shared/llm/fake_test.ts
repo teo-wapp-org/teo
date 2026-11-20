@@ -1,6 +1,7 @@
 import { assertEquals, assertStringIncludes } from "@std/assert";
 import { classify, FakeProvider } from "./fake.ts";
-import { selectProvider } from "./provider.ts";
+import { buildConfig } from "../config.ts";
+import { createProvider } from "./provider.ts";
 import type { LlmMessage, LlmRequest, LlmToolUseBlock } from "./types.ts";
 import { textOf, toolUsesOf } from "./types.ts";
 
@@ -58,9 +59,13 @@ Deno.test("fake: escalamiento y sugerencias JSON", async () => {
   assertEquals(parsed.sugerencias[0].acciones[0].estado, "esperando_pago");
 });
 
-Deno.test("selectProvider: fake sin API key, anthropic con key", () => {
-  const env = (o: Record<string, string>) => ({ get: (k: string) => o[k] });
-  assertEquals(selectProvider(env({})).name, "fake");
-  assertEquals(selectProvider(env({ ANTHROPIC_API_KEY: "sk-test" })).name, "anthropic");
-  assertEquals(selectProvider(env({ ANTHROPIC_API_KEY: "sk-test", TEO_LLM_PROVIDER: "fake" })).name, "fake");
+Deno.test("createProvider: según ai.provider y la key de Vault", () => {
+  const ai = (provider: string) => buildConfig({ ai: { provider } }, { get: () => undefined }).ai;
+  const fake = createProvider(ai("fake"), "sk-test");
+  assertEquals([fake.llm.name, fake.error], ["fake", null]);
+  const real = createProvider(ai("anthropic"), "sk-test");
+  assertEquals([real.llm.name, real.error], ["anthropic", null]);
+  // anthropic sin key → fake + error (se registra en agent_runs)
+  const missing = createProvider(ai("anthropic"), null);
+  assertEquals([missing.llm.name, missing.error], ["fake", "anthropic_key_missing"]);
 });
