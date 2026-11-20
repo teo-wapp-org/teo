@@ -6,6 +6,8 @@ import { defineConfig, devices } from "@playwright/test";
  * - Sin E2E_BASE_URL → levanta `next start` local (requiere `npm run build`).
  */
 const external = process.env.E2E_BASE_URL;
+// Id de corrida compartido con los workers (heredan el env): el teardown solo borra los usuarios QA de esta corrida.
+process.env.E2E_RUN_ID ||= `r${Date.now().toString(36)}`;
 const port = Number(process.env.E2E_PORT ?? 3123); // cada agente/worktree usa su propio puerto
 
 export default defineConfig({

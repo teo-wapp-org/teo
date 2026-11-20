@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { ArrowDown, ArrowUp, Banknote, Landmark, Link2, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -31,13 +31,27 @@ function summary(r: PaymentMethodRow) {
   return d.notas ?? "";
 }
 
-export function PaymentMethods({ slug, rows, canEdit }: { slug: string; rows: PaymentMethodRow[]; canEdit: boolean }) {
+type Change = { id: string; active: boolean } | { id: string; move: "up" | "down" };
+
+function applyChange(rows: PaymentMethodRow[], c: Change): PaymentMethodRow[] {
+  if ("active" in c) return rows.map((r) => (r.id === c.id ? { ...r, active: c.active } : r));
+  const i = rows.findIndex((r) => r.id === c.id);
+  const j = c.move === "up" ? i - 1 : i + 1;
+  if (i < 0 || j < 0 || j >= rows.length) return rows;
+  const next = [...rows];
+  [next[i], next[j]] = [next[j], next[i]];
+  return next;
+}
+
+export function PaymentMethods({ slug, rows: serverRows, canEdit }: { slug: string; rows: PaymentMethodRow[]; canEdit: boolean }) {
   const [editing, setEditing] = useState<PaymentMethodRow | "new" | null>(null);
   const [busy, start] = useTransition();
+  const [rows, addChange] = useOptimistic(serverRows, applyChange);
 
-  const run = (p: Promise<ActionState>) =>
+  const run = (change: Change, action: () => Promise<ActionState>) =>
     start(async () => {
-      const r = await p;
+      addChange(change);
+      const r = await action();
       if (r.ok && r.message) toast.success(r.message);
       else if (!r.ok && r.error) toast.error(r.error);
     });
@@ -96,16 +110,18 @@ export function PaymentMethods({ slug, rows, canEdit }: { slug: string; rows: Pa
                         role="switch"
                         className="size-4 accent-primary"
                         checked={r.active}
-                        disabled={busy}
-                        onChange={(e) => run(setPaymentMethodActive(slug, r.id, e.target.checked))}
+                        onChange={(e) => {
+                          const active = e.target.checked;
+                          run({ id: r.id, active }, () => setPaymentMethodActive(slug, r.id, active));
+                        }}
                         aria-label={`Activa: ${r.label}`}
                       />
                       Activa
                     </label>
-                    <Button variant="ghost" size="icon" disabled={busy || i === 0} onClick={() => run(movePaymentMethod(slug, r.id, "up"))} aria-label={`Subir ${r.label}`}>
+                    <Button variant="ghost" size="icon" disabled={busy || i === 0} onClick={() => run({ id: r.id, move: "up" }, () => movePaymentMethod(slug, r.id, "up"))} aria-label={`Subir ${r.label}`}>
                       <ArrowUp aria-hidden />
                     </Button>
-                    <Button variant="ghost" size="icon" disabled={busy || i === rows.length - 1} onClick={() => run(movePaymentMethod(slug, r.id, "down"))} aria-label={`Bajar ${r.label}`}>
+                    <Button variant="ghost" size="icon" disabled={busy || i === rows.length - 1} onClick={() => run({ id: r.id, move: "down" }, () => movePaymentMethod(slug, r.id, "down"))} aria-label={`Bajar ${r.label}`}>
                       <ArrowDown aria-hidden />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => setEditing(r)} aria-label={`Editar ${r.label}`}>

@@ -11,7 +11,14 @@ export function adminClient(): SupabaseClient<Database> {
   return createClient<Database>(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
-export const qaEmail = (tag: string) => `${QA_PREFIX}${tag}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@${QA_DOMAIN}`;
+/**
+ * Id de esta corrida (lo fija playwright.config.ts). Va en el email de cada usuario QA para que el teardown
+ * solo borre los de esta corrida: varias corridas (agentes/worktrees) comparten teo-dev en paralelo.
+ */
+export const RUN_ID = process.env.E2E_RUN_ID ?? "local";
+const STALE_MS = 2 * 60 * 60 * 1000; // usuarios QA huérfanos de corridas viejas
+
+export const qaEmail = (tag: string) => `${QA_PREFIX}${RUN_ID}-${tag}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@${QA_DOMAIN}`;
 
 export type QaUser = { id: string; email: string; password: string; orgId?: string; orgSlug?: string };
 
@@ -41,13 +48,25 @@ export async function createQaUser(opts: { tag: string; withOrg?: string; platfo
   return user;
 }
 
-/** Borra todos los usuarios QA de E2E y los comercios que crearon. */
+/** Agrega un usuario existente a un comercio con el rol dado (vía service role, solo para preparar tests). */
+export async function addQaMember(orgId: string, userId: string, role: "owner" | "admin" | "operador") {
+  const { error } = await adminClient().from("memberships").insert({ org_id: orgId, user_id: userId, role });
+  if (error) throw error;
+}
+
+/** Borra los usuarios QA de esta corrida (y los huérfanos de más de 2 horas) con los comercios que crearon. */
 export async function cleanupQa() {
   const admin = adminClient();
   for (let page = 1; page < 20; page++) {
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
     if (error) throw error;
-    const qa = data.users.filter((u) => u.email?.startsWith(QA_PREFIX) && u.email.endsWith(`@${QA_DOMAIN}`));
+    const now = Date.now();
+    const qa = data.users.filter(
+      (u) =>
+        u.email?.startsWith(QA_PREFIX) &&
+        u.email.endsWith(`@${QA_DOMAIN}`) &&
+        (u.email.startsWith(`${QA_PREFIX}${RUN_ID}-`) || now - new Date(u.created_at).getTime() > STALE_MS),
+    );
     for (const u of qa) {
       await admin.from("organizations").delete().eq("created_by", u.id);
       await admin.auth.admin.deleteUser(u.id);
