@@ -540,6 +540,8 @@ export type Database = {
           media_path: string | null
           org_id: string
           payload: Json | null
+          send_attempts: number
+          send_claimed_at: string | null
           status: Database["public"]["Enums"]["message_status"]
           type: string
           wamid: string | null
@@ -557,6 +559,8 @@ export type Database = {
           media_path?: string | null
           org_id: string
           payload?: Json | null
+          send_attempts?: number
+          send_claimed_at?: string | null
           status?: Database["public"]["Enums"]["message_status"]
           type?: string
           wamid?: string | null
@@ -574,6 +578,8 @@ export type Database = {
           media_path?: string | null
           org_id?: string
           payload?: Json | null
+          send_attempts?: number
+          send_claimed_at?: string | null
           status?: Database["public"]["Enums"]["message_status"]
           type?: string
           wamid?: string | null
@@ -1343,12 +1349,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_member_by_email: {
+        Args: {
+          p_email: string
+          p_org: string
+          p_role?: Database["public"]["Enums"]["org_role"]
+        }
+        Returns: string
+      }
       admin_set_org_status: {
         Args: {
           p_org: string
           p_status: Database["public"]["Enums"]["org_status"]
         }
         Returns: undefined
+      }
+      apply_whatsapp_status: {
+        Args: { p_error?: string; p_status: string; p_wamid: string }
+        Returns: boolean
       }
       can_operate: { Args: { p_org: string }; Returns: boolean }
       case_transition_allowed: {
@@ -1357,6 +1375,47 @@ export type Database = {
           p_to: Database["public"]["Enums"]["case_status"]
         }
         Returns: boolean
+      }
+      claim_whatsapp_outbound: {
+        Args: { p_limit?: number; p_message?: string }
+        Returns: {
+          author: string
+          body: string | null
+          case_id: string | null
+          conversation_id: string
+          created_at: string
+          direction: Database["public"]["Enums"]["message_direction"]
+          error: string | null
+          id: string
+          media_mime: string | null
+          media_path: string | null
+          org_id: string
+          payload: Json | null
+          send_attempts: number
+          send_claimed_at: string | null
+          status: Database["public"]["Enums"]["message_status"]
+          type: string
+          wamid: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "messages"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      connect_whatsapp_account: {
+        Args: {
+          p_display_phone?: string
+          p_org: string
+          p_phone_number_id: string
+          p_quality_rating?: string
+          p_status?: Database["public"]["Enums"]["wa_account_status"]
+          p_token: string
+          p_verified_name?: string
+          p_waba_id: string
+        }
+        Returns: string
       }
       create_organization: {
         Args: { p_name: string; p_rubro?: string }
@@ -1379,6 +1438,16 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      delete_inbound: { Args: { p_msg_id: number }; Returns: boolean }
+      disconnect_whatsapp_account: {
+        Args: { p_org: string }
+        Returns: undefined
+      }
+      enqueue_inbound: {
+        Args: { p_conversation: string; p_delay?: number; p_org: string }
+        Returns: number
+      }
+      get_whatsapp_token: { Args: { p_account: string }; Returns: string }
       has_org_role: {
         Args: {
           p_org: string
@@ -1389,6 +1458,25 @@ export type Database = {
       increment_teo_usage: {
         Args: { p_n?: number; p_org: string }
         Returns: number
+      }
+      ingest_whatsapp_message: {
+        Args: {
+          p_account: string
+          p_body: string
+          p_payload: Json
+          p_profile_name: string
+          p_sent_at?: string
+          p_type: string
+          p_wa_id: string
+          p_wamid: string
+        }
+        Returns: {
+          case_id: string
+          conversation_id: string
+          inserted: boolean
+          message_id: string
+          org_id: string
+        }[]
       }
       is_org_member: { Args: { p_org: string }; Returns: boolean }
       is_platform_admin: { Args: never; Returns: boolean }
@@ -1401,6 +1489,25 @@ export type Database = {
           p_target?: string
         }
         Returns: undefined
+      }
+      org_members: {
+        Args: { p_org: string }
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          role: Database["public"]["Enums"]["org_role"]
+          user_id: string
+        }[]
+      }
+      read_inbound: {
+        Args: { p_qty?: number; p_vt?: number }
+        Returns: {
+          conversation_id: string
+          msg_id: number
+          org_id: string
+          read_ct: number
+        }[]
       }
       recalc_order: {
         Args: { p_order: string }
@@ -1426,6 +1533,13 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      resolve_whatsapp_account: {
+        Args: { p_phone_number_id: string }
+        Returns: {
+          account_id: string
+          org_id: string
+        }[]
       }
       review_payment: {
         Args: { p_approve: boolean; p_payment: string; p_reason?: string }
@@ -1485,6 +1599,12 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      try_lock_conversation: {
+        Args: { p_conversation: string }
+        Returns: boolean
+      }
+      whatsapp_send_invoke: { Args: { p_body: Json }; Returns: number }
+      whatsapp_send_sweep: { Args: never; Returns: undefined }
     }
     Enums: {
       agent_mode: "piloto" | "copiloto"
