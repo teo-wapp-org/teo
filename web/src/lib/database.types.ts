@@ -1343,6 +1343,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_member_by_email: {
+        Args: {
+          p_email: string
+          p_org: string
+          p_role?: Database["public"]["Enums"]["org_role"]
+        }
+        Returns: string
+      }
       admin_set_org_status: {
         Args: {
           p_org: string
@@ -1401,6 +1409,16 @@ export type Database = {
           p_target?: string
         }
         Returns: undefined
+      }
+      org_members: {
+        Args: { p_org: string }
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          role: Database["public"]["Enums"]["org_role"]
+          user_id: string
+        }[]
       }
       recalc_order: {
         Args: { p_order: string }
