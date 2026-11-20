@@ -847,6 +847,7 @@ Se toma como base el esquema de context-gpt (Starter a $29 con 500 mensajes al d
 | D-11 | Un caso abierto por contacto; una compra nueva abre un caso nuevo |
 | D-12 | El LLM nunca calcula precios ni totales: lo hace el backend |
 | D-13 | La confirmación de pago es manual en la Fase 1 |
+| D-18 | Contexto del comercio (Fase 1): solo owner/admin editan configuración, tiendas y equipo (RLS + validación en cada Server Action); operadores y el equipo Teo en impersonación ven todo en solo lectura. Invitar al equipo solo agrega usuarios que ya tienen cuenta (`add_member_by_email`, respeta `max_users` del plan); sin correos de invitación por ahora. Las tiendas respetan `max_stores` del plan. Google Places solo desde el servidor (`GOOGLE_PLACES_API_KEY`), habilitado para planes con `google_places`; los datos importados se revisan antes de guardar. Horario: `{ lun: [{open, close}], … }`; un turno que cruza medianoche se parte en dos (hasta 23:59 y desde 00:00) |
 
 ### Abiertas (necesitan respuesta)
 
@@ -965,3 +966,4 @@ La verificación del negocio en Meta, obligatoria para ser Tech Provider, pide d
 | 2026-11-20 | 0.8 | Sección 17.1: 4 planes (Gratis, Emprende $19, Negocio $39 ⭐ como gancho, Pro $99) cobrados por mensajes de Teo, con base en los precios de context-gpt. D-10 parcialmente cerrada (falta la pasarela). Organización de GitHub `teo-wapp-org`. |
 | 2026-11-20 | 0.9 | Fase 0 implementada: repo `teo-wapp-org/teo`, Supabase `teo-dev` (ref `mczghfseqbccbkwepzrs`) con migraciones de fundaciones + RLS probada, design system de marca, landing con precios, registro/login, onboarding, panel del comercio (inicio, casos) y panel superadmin. Se desactivó `cacheComponents` de Next 16 (app dinámica por sesión). Pendiente: importar el proyecto en Vercel y configurar las URLs de Auth. |
 | 2026-11-20 | 0.10 | Producción en Vercel (team `teo-6a57`, plan Hobby): https://teo-lac-phi.vercel.app. Variables de Supabase cargadas; Auth con `site_url` y URLs de redirección configuradas. Pendiente antes de tener usuarios reales: SMTP propio (Resend), plantillas de correo en español y pasar Vercel a Pro (Hobby no permite uso comercial). |
+| 2026-11-21 | 0.11 | Fase 1, contexto del comercio: Configuración (negocio, formas de pago, Teo, equipo; WhatsApp pendiente), Tiendas con horario semanal e importación desde Google Places, checklist de inicio con datos reales. Migración `equipo` (`org_members`, `add_member_by_email`) y tests SQL `rls_contexto`. Vitest para funciones puras. El teardown E2E solo borra los usuarios QA de su corrida. Decisión D-18. |
