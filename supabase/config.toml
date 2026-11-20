@@ -396,7 +396,7 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
 
 # ─── Edge Functions de WhatsApp ───
-# Meta no envía JWT: el webhook valida X-Hub-Signature-256 (WHATSAPP_APP_SECRET).
+# Meta no envía JWT: el webhook valida X-Hub-Signature-256 (secreto meta_app_secret de Vault; respaldo WHATSAPP_APP_SECRET).
 [functions.whatsapp-webhook]
 verify_jwt = false
 
@@ -415,3 +415,21 @@ enabled = true
 # protegida con x-teo-cron-secret (pg_cron + Vault)
 verify_jwt = false
 import_map = "./functions/agent-runner/deno.json"
+
+# ── Panel superadmin: pruebas de conexión y config de Auth (solo superadmin; secretos nunca salen) ──
+[functions.admin-ops]
+enabled = true
+verify_jwt = true
+import_map = "./functions/admin-ops/deno.json"
+
+# ── Google Places para el panel del comercio (miembro del comercio; key en Vault) ──
+[functions.places]
+enabled = true
+verify_jwt = true
+import_map = "./functions/places/deno.json"
+
+# ── Embedded Signup de Meta: intercambio de code por token (owner/admin; app secret en Vault) ──
+[functions.whatsapp-connect]
+enabled = true
+verify_jwt = true
+import_map = "./functions/whatsapp-connect/deno.json"
