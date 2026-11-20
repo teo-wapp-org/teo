@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Da rol de equipo Teo a un usuario YA registrado (se registra normal en /registro).
+# Uso: ./scripts/make-superadmin correo@dominio.com [superadmin|soporte]
+set -euo pipefail
+EMAIL="${1:?Uso: ./scripts/make-superadmin correo [superadmin|soporte]}"
+ROLE="${2:-superadmin}"
+[[ "$ROLE" =~ ^(superadmin|soporte)$ ]] || { echo "Rol inválido: $ROLE" >&2; exit 1; }
+[[ "$EMAIL" =~ ^[^\'\;[:space:]]+@[^\'\;[:space:]]+$ ]] || { echo "Correo inválido" >&2; exit 1; }
+
+SQL="insert into public.platform_admins (user_id, role)
+select id, '$ROLE'::public.platform_role from auth.users where lower(email) = lower('$EMAIL')
+on conflict (user_id) do update set role = excluded.role
+returning user_id, role;"
+
+OUT="$("$(dirname "$0")/supa" db query --linked "$SQL" -o table --agent=no 2>&1 | grep -v 'new version\|recommend\|Initialising')"
+echo "$OUT"
+grep -q "$ROLE" <<<"$OUT" || { echo "No se encontró un usuario con ese correo. Regístralo primero en /registro." >&2; exit 1; }

@@ -1,0 +1,43 @@
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
+
+const PROTECTED = ["/app", "/admin", "/onboarding"];
+
+export async function updateSession(request: NextRequest) {
+  let response = NextResponse.next({ request });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (toSet) => {
+          toSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({ request });
+          toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        },
+      },
+    },
+  );
+
+  const { data } = await supabase.auth.getClaims();
+  const isAuthed = Boolean(data?.claims?.sub);
+  const path = request.nextUrl.pathname;
+
+  if (!isAuthed && PROTECTED.some((p) => path === p || path.startsWith(`${p}/`))) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("next", path);
+    return NextResponse.redirect(url);
+  }
+
+  if (isAuthed && (path === "/login" || path === "/registro")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/app";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
+  return response;
+}
