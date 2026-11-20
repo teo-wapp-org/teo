@@ -8,3 +8,6 @@ web/.next/
 web/node_modules/
 supabase/.temp/
 supabase/.branches/
+
+# Vercel CLI
+web/.vercel/

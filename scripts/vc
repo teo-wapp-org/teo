@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Wrapper de la CLI de Vercel para Teo. Usa el token de Vercel de Teo guardado en el Llavero de macOS.
+# Uso: ./scripts/vc <comando de vercel>    Ej.: ./scripts/vc ls   ·   ./scripts/vc env ls
+# Guardar o rotar el token: ./scripts/vc-set-token <token>
+set -euo pipefail
+SERVICE="teo-vercel-token"
+if ! TOKEN="$(security find-generic-password -a "$USER" -s "$SERVICE" -w 2>/dev/null)"; then
+  echo "No hay token de Vercel de Teo en el Llavero." >&2
+  echo "Créalo en https://vercel.com/account/settings/tokens (scope: el team de Teo) y ejecuta:" >&2
+  echo "  ./scripts/vc-set-token <token>" >&2
+  exit 1
+fi
+cd "$(dirname "$0")/../web"
+exec npx --yes vercel@latest --token "$TOKEN" "$@"

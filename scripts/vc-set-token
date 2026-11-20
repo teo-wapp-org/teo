@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Guarda (o reemplaza) en el Llavero el token de Vercel de Teo. Uso: ./scripts/vc-set-token <token>
+set -euo pipefail
+TOKEN="${1:?Uso: ./scripts/vc-set-token <token>}"
+security add-generic-password -U -a "$USER" -s "teo-vercel-token" -l "Teo · Vercel CLI" -w "$TOKEN"
+echo "Token guardado en el Llavero (teo-vercel-token). Probando acceso…"
+exec "$(dirname "$0")/vc" whoami
