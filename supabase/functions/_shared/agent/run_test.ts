@@ -5,6 +5,7 @@ import { PRICE_GUARD_TEXT, runAgentTurn } from "./run.ts";
 import { generateSuggestions } from "./suggest.ts";
 import { addProduct, createQaOrg, dbTest, deleteOrg, deps, inbound, ScriptedProvider } from "./testing.ts";
 
+// deno-lint-ignore no-explicit-any -- cliente de test
 const caseOf = async (db: any, caseId: string) =>
   (await db.from("cases").select("status, type, estimated_amount").eq("id", caseId).single()).data;
 

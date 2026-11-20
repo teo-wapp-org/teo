@@ -11,6 +11,8 @@ import { isOpenNow, formatHours, type Hours } from "./hours.ts";
 import { keywords, normalize } from "./text.ts";
 import type { ToolContext } from "./types.ts";
 
+type VariantRow = { id: string; name: string; price: number | string | null; stock: number | null; active: boolean };
+
 /** Error con mensaje apto para el modelo (se devuelve como tool_result is_error). */
 export class ToolError extends Error {}
 
@@ -74,6 +76,7 @@ const buscar_productos: ToolDef<typeof buscarSchema> = {
     }
     const withCat = <T extends { eq: (c: string, v: string) => T }>(q: T) => (categoryId ? q.eq("category_id", categoryId) : q);
 
+    // deno-lint-ignore no-explicit-any -- filas de PostgREST con relaciones embebidas
     let rows: any[] = [];
     if (words.length) {
       const fts = await withCat(base()).textSearch("search_tsv", words.map((w) => `${w}:*`).join(" | "), { config: "spanish" });
@@ -93,7 +96,7 @@ const buscar_productos: ToolDef<typeof buscarSchema> = {
         precio: Number(p.price),
         disponible: p.stock === null || p.stock > 0,
         stock: p.stock,
-        variantes: (p.variants ?? []).filter((v: any) => v.active).map((v: any) => ({
+        variantes: ((p.variants ?? []) as VariantRow[]).filter((v) => v.active).map((v) => ({
           id: v.id, nombre: v.name, precio: Number(v.price ?? p.price), disponible: v.stock === null || v.stock > 0,
         })),
       })),
@@ -127,7 +130,7 @@ const ver_producto: ToolDef<typeof verSchema> = {
       stock: data.stock,
       disponible: data.stock === null || data.stock > 0,
       atributos: data.attributes,
-      variantes: ((data.variants ?? []) as any[]).filter((v) => v.active).map((v) => ({
+      variantes: ((data.variants ?? []) as VariantRow[]).filter((v) => v.active).map((v) => ({
         id: v.id, nombre: v.name, precio: Number(v.price ?? data.price), disponible: v.stock === null || v.stock > 0,
       })),
       fotos: (data.media ?? []).length,
