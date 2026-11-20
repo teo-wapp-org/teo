@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Tests Deno de las Edge Functions (unitarios + integración contra teo-dev con datos QA que se borran).
+#   ./scripts/test-functions            → todos
+#   ./scripts/test-functions --filter "guardrail"
+set -euo pipefail
+cd "$(dirname "$0")/.."
+REF=$(cat supabase/.temp/project-ref)
+KEYS=$(./scripts/supa projects api-keys --project-ref "$REF" -o json 2>/dev/null)
+export SUPABASE_URL="https://$REF.supabase.co"
+export SUPABASE_SERVICE_ROLE_KEY=$(python3 -c "import sys,json;print([k['api_key'] for k in json.load(sys.stdin) if k['name']=='service_role'][0])" <<<"$KEYS")
+DENO=$(command -v deno || echo "$HOME/.deno/bin/deno")
+cd supabase/functions
+exec "$DENO" test --allow-env --allow-net "$@" .

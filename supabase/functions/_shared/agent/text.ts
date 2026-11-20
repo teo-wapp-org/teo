@@ -45,10 +45,32 @@ export function moneyAmounts(text: string): string[] {
   return [...out];
 }
 
-/** Todos los números de un texto como montos (para la lista blanca de precios conocidos). */
-export function numbersIn(text: string): Set<string> {
+const PRICE_KEY = /precio|price|total|subtotal|envio|shipping|monto|amount/i;
+
+/**
+ * Montos "conocidos" de una fuente: si es JSON (resultado de herramienta), los valores numéricos de
+ * claves de dinero (precio, total, subtotal, envío...); si es texto, los montos con $ o "dólares".
+ * Así los ids, cantidades o "Caso #1" no cuelan números arbitrarios en la lista blanca.
+ */
+export function knownAmounts(source: string): Set<string> {
   const out = new Set<string>();
-  for (const m of text.matchAll(/\d{1,6}(?:[.,]\d{1,2})?/g)) out.add(Number(m[0].replace(",", ".")).toFixed(2));
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(source);
+  } catch {
+    parsed = undefined;
+  }
+  if (parsed && typeof parsed === "object") {
+    const walk = (v: unknown, key = "") => {
+      if (typeof v === "number" && PRICE_KEY.test(key)) out.add(v.toFixed(2));
+      else if (typeof v === "string") for (const a of moneyAmounts(v)) out.add(a);
+      else if (Array.isArray(v)) v.forEach((x) => walk(x, key));
+      else if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) walk(x, k);
+    };
+    walk(parsed);
+  } else {
+    for (const a of moneyAmounts(source)) out.add(a);
+  }
   return out;
 }
 
@@ -58,7 +80,7 @@ export function numbersIn(text: string): Set<string> {
  */
 export function unknownAmounts(reply: string, knownSources: string[]): string[] {
   const known = new Set<string>();
-  for (const s of knownSources) for (const n of numbersIn(s)) known.add(n);
+  for (const s of knownSources) for (const n of knownAmounts(s)) known.add(n);
   return moneyAmounts(reply).filter((a) => !known.has(a));
 }
 

@@ -16,9 +16,11 @@ Deno.test("formatUsd y montos", () => {
 });
 
 Deno.test("guardrail de precios: detecta montos que no vienen de una fuente", () => {
-  const sources = ['{"precio":18.5}', "Pedido: 1 x Torta (18.50)"];
-  assertEquals(unknownAmounts("Cuesta $18.50", sources), []);
+  const sources = ['{"precio":18.5,"cantidad":2,"id":"a1b2"}', "Caso #1. Envío a domicilio: $3", "Torta: $20.00 [id 1f2e]"];
+  assertEquals(unknownAmounts("Cuesta $18.50 + $3 de envío; la otra $20", sources), []);
   assertEquals(unknownAmounts("Te la dejo en $15", sources), ["15.00"]);
+  assertEquals(unknownAmounts("Son $2", sources), ["2.00"]); // cantidad no es precio
+  assertEquals(unknownAmounts("Total $1", sources), ["1.00"]); // "Caso #1" no es precio
 });
 
 Deno.test("sanitizeReply: formato WhatsApp y URLs permitidas", () => {
