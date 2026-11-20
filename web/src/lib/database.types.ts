@@ -52,6 +52,29 @@ export type Database = {
           },
         ]
       }
+      agent_locks: {
+        Row: {
+          conversation_id: string
+          locked_until: string
+        }
+        Insert: {
+          conversation_id: string
+          locked_until: string
+        }
+        Update: {
+          conversation_id?: string
+          locked_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_locks_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: true
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_runs: {
         Row: {
           cache_read_tokens: number | null
@@ -1376,6 +1399,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      claim_conversation: {
+        Args: { p_conversation: string; p_seconds?: number }
+        Returns: boolean
+      }
       claim_whatsapp_outbound: {
         Args: { p_limit?: number; p_message?: string }
         Returns: {
@@ -1478,6 +1505,7 @@ export type Database = {
           org_id: string
         }[]
       }
+      invoke_agent_runner: { Args: never; Returns: number }
       is_org_member: { Args: { p_org: string }; Returns: boolean }
       is_platform_admin: { Args: never; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
@@ -1533,6 +1561,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      release_conversation: {
+        Args: { p_conversation: string }
+        Returns: undefined
       }
       resolve_whatsapp_account: {
         Args: { p_phone_number_id: string }
