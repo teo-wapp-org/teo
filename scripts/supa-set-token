@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Guarda (o reemplaza) en el Llavero de macOS el token de Supabase de la cuenta de Teo.
+# Uso: ./scripts/supa-set-token sbp_xxx
+set -euo pipefail
+
+SERVICE="teo-supabase-access-token"
+TOKEN="${1:-}"
+
+if [[ ! "$TOKEN" =~ ^sbp_ ]]; then
+  echo "Uso: ./scripts/supa-set-token sbp_xxx  (token de https://supabase.com/dashboard/account/tokens)" >&2
+  exit 1
+fi
+
+security add-generic-password -U -a "$USER" -s "$SERVICE" -l "Teo · Supabase CLI" -w "$TOKEN"
+echo "Token guardado en el Llavero ($SERVICE). Probando acceso…"
+exec "$(dirname "$0")/supa" projects list

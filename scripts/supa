@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Wrapper de la CLI de Supabase para el proyecto Teo.
+# Usa el token de la cuenta de Teo guardado en el Llavero de macOS,
+# sin tocar el login global (que puede seguir apuntando a otra cuenta).
+#
+# Uso:   ./scripts/supa <comando de supabase>
+# Ej.:   ./scripts/supa projects list
+#        ./scripts/supa db push
+#
+# Guardar o actualizar el token: ./scripts/supa-set-token sbp_xxx
+set -euo pipefail
+
+SERVICE="teo-supabase-access-token"
+
+if ! TOKEN="$(security find-generic-password -a "$USER" -s "$SERVICE" -w 2>/dev/null)"; then
+  echo "No hay token de Supabase de Teo en el Llavero." >&2
+  echo "Genéralo en https://supabase.com/dashboard/account/tokens (cuenta de Teo) y ejecuta:" >&2
+  echo "  ./scripts/supa-set-token sbp_xxx" >&2
+  exit 1
+fi
+
+cd "$(dirname "$0")/.."
+SUPABASE_ACCESS_TOKEN="$TOKEN" exec supabase "$@"
