@@ -74,7 +74,7 @@ export const CONFIG_TTL_MS = 30_000;
 
 /** Lo mínimo que se necesita del cliente de Supabase (service role). */
 export type RpcClient = {
-  rpc(fn: string, args?: Record<string, unknown>): PromiseLike<{ data: unknown; error: { message: string } | null }>;
+  rpc(fn: string, args?: Record<string, unknown>): PromiseLike<{ data: unknown; error: { message: string; code?: string } | null }>;
 };
 export type EnvReader = { get(k: string): string | undefined };
 
