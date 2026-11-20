@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Simula webhooks de Meta (WhatsApp Cloud API) firmados con el App Secret y los envía al webhook desplegado.
+#
+#   ./scripts/wa-simulate text   <phone_number_id> <wa_id_cliente> "<texto>" [--name "Ana"] [--wamid wamid.X]
+#   ./scripts/wa-simulate image  <phone_number_id> <wa_id_cliente> <media_id> ["caption"] [--wamid wamid.X]
+#   ./scripts/wa-simulate status <phone_number_id> <wamid> <sent|delivered|read|failed> [wa_id_cliente]
+#   ./scripts/wa-simulate verify                       # prueba el GET hub.challenge
+#   Opciones: --bad-signature (debe responder 401), --dry-run (solo imprime el payload)
+#   WA_WEBHOOK_URL=... para apuntar a otro webhook (por defecto, el de teo-dev).
+#
+# El App Secret sale del Llavero de macOS (servicio teo-wa-app-secret). Si no existe, se genera uno
+# aleatorio, se guarda en el Llavero y se sube como secret WHATSAPP_APP_SECRET a Supabase.
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+DENO=$(command -v deno || echo "$HOME/.deno/bin/deno")
+
+if ! APP_SECRET="$(security find-generic-password -s teo-wa-app-secret -w 2>/dev/null)"; then
+  APP_SECRET="$(openssl rand -hex 32)"
+  security add-generic-password -a "$USER" -s teo-wa-app-secret -w "$APP_SECRET"
+  "$ROOT/scripts/supa" secrets set "WHATSAPP_APP_SECRET=$APP_SECRET" >/dev/null
+  echo "Nuevo WHATSAPP_APP_SECRET generado, guardado en el Llavero y en Supabase." >&2
+fi
+VERIFY_TOKEN="$(security find-generic-password -s teo-wa-verify-token -w 2>/dev/null || true)"
+REF="$(cat "$ROOT/supabase/.temp/project-ref")"
+
+WA_APP_SECRET="$APP_SECRET" WA_VERIFY_TOKEN="$VERIFY_TOKEN" \
+WA_WEBHOOK_URL="${WA_WEBHOOK_URL:-https://$REF.supabase.co/functions/v1/whatsapp-webhook}" \
+  exec "$DENO" run --allow-net --allow-env=WA_APP_SECRET,WA_VERIFY_TOKEN,WA_WEBHOOK_URL "$ROOT/scripts/wa-simulate.ts" "$@"

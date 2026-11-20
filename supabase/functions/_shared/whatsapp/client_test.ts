@@ -93,6 +93,13 @@ Deno.test("errores de Graph: código, reintentable o no", async () => {
   assertEquals([e3.status, e3.code, e3.retriable], [401, 190, false]);
 });
 
+Deno.test("el token nunca aparece en el mensaje de error", async () => {
+  const token = "EAAG-token-secreto-1234567890";
+  const { f } = fakeFetch([{ status: 400, body: { error: { message: `Malformed access token ${token}`, code: 190 } } }]);
+  const e = await assertRejects(() => new WhatsAppClient({ token, phoneNumberId: "111", fetch: f }).sendText("5939", "hola"), GraphError);
+  assertEquals(e.message, "Malformed access token ***");
+});
+
 Deno.test("media: GET /{media_id} y descarga con el token", async () => {
   const calls: string[] = [];
   const f = ((url: string, init: RequestInit) => {

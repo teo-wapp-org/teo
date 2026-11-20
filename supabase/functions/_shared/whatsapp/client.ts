@@ -133,7 +133,9 @@ export class WhatsAppClient {
       const err = (data as { error?: { message?: string; code?: number; error_data?: { details?: string } } }).error;
       const code = err?.code ?? null;
       const retriable = res.status >= 500 || res.status === 429 || (code !== null && RETRIABLE_CODES.has(code));
-      throw new GraphError(err?.error_data?.details || err?.message || `HTTP ${res.status}`, res.status, code, retriable);
+      // Meta a veces repite el token en el mensaje ("Malformed access token EAAG…"): nunca se guarda ni se loguea.
+      const text = (err?.error_data?.details || err?.message || `HTTP ${res.status}`).split(this.opts.token).join("***");
+      throw new GraphError(text.replace(/EAA[A-Za-z0-9]{10,}/g, "***"), res.status, code, retriable);
     }
     return data as T;
   }
