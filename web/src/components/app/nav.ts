@@ -12,4 +12,4 @@ export const ORG_NAV = [
   { slug: "configuracion", label: "Configuración", icon: Settings },
 ] as const;
 
-export const PLACEHOLDER_SECTIONS = new Set(["conversaciones", "clientes", "metricas"]);
+export const PLACEHOLDER_SECTIONS = new Set<string>();
