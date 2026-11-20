@@ -63,11 +63,11 @@ export default async function MetricasPage({ params, searchParams }: PageProps<"
       <dl className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Indicadores clave">
         <Tile id="conversaciones" label="Conversaciones activas" value={formatNumber(k.conversaciones)} hint={`${formatNumber(k.casos)} casos abiertos en el rango`} />
         <Tile id="ventas" label="Ventas confirmadas" value={formatMoney(k.ventasConfirmadas)} hint={`${k.pagosConfirmados} ${k.pagosConfirmados === 1 ? "pago" : "pagos"}`} />
-        <Tile id="conversion" label="Conversión" value={formatPercent(k.conversion.ratio)} hint={ratioHint(k.conversion, "ventas")} goal="> 25 %" />
-        <Tile id="llegada-pago" label="Llegada a pago" value={formatPercent(k.llegadaPago.ratio)} hint={ratioHint(k.llegadaPago, "ventas")} goal="> 40 %" />
-        <Tile id="autonomia" label="Autonomía de Teo" value={formatPercent(k.autonomia.ratio)} hint={ratioHint(k.autonomia, "cerrados")} goal="> 60 %" />
-        <Tile id="confirmacion" label="Confirmación de pago (mediana)" value={k.tiempoConfirmacionMs === null ? "—" : formatDuration(k.tiempoConfirmacionMs)} goal="< 2 h" />
-        <Tile id="sugerencias" label="Uso de sugerencias" value={formatPercent(k.usoSugerencias.ratio)} hint={ratioHint(k.usoSugerencias, "sugerencias")} goal="> 50 %" />
+        <Tile id="conversion" label="Conversión" value={formatPercent(k.conversion.ratio)} hint={ratioHint(k.conversion, "ventas")} goal={"> 25\u00a0%"} />
+        <Tile id="llegada-pago" label="Llegada a pago" value={formatPercent(k.llegadaPago.ratio)} hint={ratioHint(k.llegadaPago, "ventas")} goal={"> 40\u00a0%"} />
+        <Tile id="autonomia" label="Autonomía de Teo" value={formatPercent(k.autonomia.ratio)} hint={ratioHint(k.autonomia, "cerrados")} goal={"> 60\u00a0%"} />
+        <Tile id="confirmacion" label="Confirmación de pago (mediana)" value={k.tiempoConfirmacionMs === null ? "—" : formatDuration(k.tiempoConfirmacionMs)} goal={"< 2\u00a0h"} />
+        <Tile id="sugerencias" label="Uso de sugerencias" value={formatPercent(k.usoSugerencias.ratio)} hint={ratioHint(k.usoSugerencias, "sugerencias")} goal={"> 50\u00a0%"} />
         <div className="rounded-xl border border-border bg-card p-4">
           <dt className="text-xs font-medium text-muted-foreground">Mensajes de Teo (periodo del plan)</dt>
           <dd className="mt-1 font-heading text-2xl font-bold tabular-nums" data-testid="kpi-teo">
