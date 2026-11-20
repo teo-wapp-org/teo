@@ -59,9 +59,13 @@ begin
   exception when check_violation then
     if sqlerrm not like 'plan_limit_products%' then raise; end if;
   end;
-  -- editar sí se puede aunque esté en el tope
+  -- editar sí se puede aunque esté en el tope (update directo o upsert por id, como hace la importación)
   update public.products set price = 2 where org_id = v_org and name = 'Relleno 1';
   if (select price from public.products where org_id = v_org and name = 'Relleno 1') <> 2 then raise exception 'FAIL editar en el tope'; end if;
+  insert into public.products (id, org_id, name, price)
+  select id, org_id, name, 3 from public.products where org_id = v_org and name = 'Relleno 2'
+  on conflict (id) do update set price = excluded.price;
+  if (select price from public.products where org_id = v_org and name = 'Relleno 2') <> 3 then raise exception 'FAIL upsert en el tope'; end if;
 end $$;
 
 -- Plan ilimitado (Pro): sin tope

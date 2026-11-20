@@ -24,6 +24,11 @@ begin
     return new;
   end if;
 
+  -- upsert de un producto que ya existe (importación): es una actualización, no suma al conteo
+  if exists (select 1 from public.products where id = new.id) then
+    return new;
+  end if;
+
   select count(*) into v_used from public.products where org_id = new.org_id;
   if v_used >= v_max then
     raise exception 'plan_limit_products: tu plan permite % productos', v_max
