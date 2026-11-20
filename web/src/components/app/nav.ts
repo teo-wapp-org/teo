@@ -1,4 +1,4 @@
-import { BarChart3, Home, Layers, MessageCircle, Package, Settings, Store, Users } from "lucide-react";
+import { BarChart3, FlaskConical, Home, Layers, MessageCircle, Package, Settings, Store, Users } from "lucide-react";
 
 export const ORG_NAV = [
   { slug: "", label: "Inicio", icon: Home },
@@ -8,6 +8,7 @@ export const ORG_NAV = [
   { slug: "catalogo", label: "Catálogo", icon: Package },
   { slug: "tiendas", label: "Tiendas", icon: Store },
   { slug: "metricas", label: "Métricas", icon: BarChart3 },
+  { slug: "simulador", label: "Simulador", icon: FlaskConical },
   { slug: "configuracion", label: "Configuración", icon: Settings },
 ] as const;
 

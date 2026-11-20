@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
-# Tests (Deno) de las Edge Functions: lint, tipos y Deno.test. No tocan la red ni la base.
+# Tests de las Edge Functions (Deno): lint, tipos y Deno.test.
+# Incluye tests de integración contra teo-dev (datos QA que se borran solos).
+#   ./scripts/test-functions                      → todos
+#   ./scripts/test-functions --filter "guardrail" → filtrados
 set -euo pipefail
-cd "$(dirname "$0")/../supabase/functions"
+cd "$(dirname "$0")/.."
+REF=$(cat supabase/.temp/project-ref)
+KEYS=$(./scripts/supa projects api-keys --project-ref "$REF" -o json 2>/dev/null)
+export SUPABASE_URL="https://$REF.supabase.co"
+export SUPABASE_SERVICE_ROLE_KEY=$(python3 -c "import sys,json;print([k['api_key'] for k in json.load(sys.stdin) if k['name']=='service_role'][0])" <<<"$KEYS")
 DENO=$(command -v deno || echo "$HOME/.deno/bin/deno")
+cd supabase/functions
 "$DENO" lint
-"$DENO" check */index.ts
-"$DENO" test --allow-env "$@"
+for f in */index.ts; do "$DENO" check "$f"; done
+exec "$DENO" test --allow-env --allow-net "$@" .

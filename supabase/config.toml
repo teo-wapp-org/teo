@@ -403,3 +403,15 @@ verify_jwt = false
 # La llama pg_net (trigger/pg_cron) con x-teo-send-secret leído de Vault (= WHATSAPP_SEND_SECRET).
 [functions.whatsapp-send]
 verify_jwt = false
+
+# ── Edge Functions del agente ──
+[functions.agent]
+enabled = true
+verify_jwt = true
+import_map = "./functions/agent/deno.json"
+
+[functions.agent-runner]
+enabled = true
+# protegida con x-teo-cron-secret (pg_cron + Vault)
+verify_jwt = false
+import_map = "./functions/agent-runner/deno.json"
