@@ -392,7 +392,8 @@ Implicancias para el producto:
 
 ### 8.2 Webhook
 
-- Un endpoint por app (Edge Function `webhook`, ruta `/webhook/whatsapp`), común a todos los comercios. El comercio se resuelve por `phone_number_id`.
+- Un endpoint por app (Edge Function `whatsapp-webhook`, `https://<ref>.supabase.co/functions/v1/whatsapp-webhook`), común a todos los comercios. El comercio se resuelve por `phone_number_id` (solo cuentas en estado `conectado`).
+- **Implementado (migración `20261121040000_whatsapp.sql`):** ingesta atómica `ingest_whatsapp_message()` (contacto + conversación + caso `nuevo` + mensaje, `wamid` único), media a `media/{org_id}/{conversation_id}/{wamid}.{ext}`, cola `enqueue_inbound(..., 4)` y statuses que nunca retroceden (`apply_whatsapp_status()`). Envío: trigger AFTER INSERT en `messages` (`out`/`queued`) → `pg_net` → Edge Function `whatsapp-send` (secreto compartido en Vault), con barrido `pg_cron` cada minuto y reclamo atómico para no enviar dos veces. Graph API `v24.0` (constante única). Pruebas con payloads firmados: `./scripts/wa-simulate`.
 - Verificación del `hub.challenge` (GET) y de la firma `X-Hub-Signature-256` con el App Secret (POST).
 - **Idempotencia:** unique sobre `wamid`. Meta reintenta, así que los duplicados se ignoran.
 - Se responde 200 en menos de 1 s: el webhook solo persiste y encola, nunca procesa la IA en línea.
@@ -847,6 +848,7 @@ Se toma como base el esquema de context-gpt (Starter a $29 con 500 mensajes al d
 | D-11 | Un caso abierto por contacto; una compra nueva abre un caso nuevo |
 | D-12 | El LLM nunca calcula precios ni totales: lo hace el backend |
 | D-13 | La confirmación de pago es manual en la Fase 1 |
+| D-18 | ✅ WhatsApp: token por comercio solo en Vault (`connect_whatsapp_account()`/`get_whatsapp_token()`, este último solo `service_role`). Mientras no haya Tech Provider, el panel permite la **conexión manual** (phone_number_id + WABA + token); si Meta no valida el token, queda `pendiente` y el webhook la ignora. Fuera de la ventana de 24 h solo salen plantillas; el texto libre se marca `failed` con `ventana_cerrada` |
 
 ### Abiertas (necesitan respuesta)
 
@@ -965,3 +967,4 @@ La verificación del negocio en Meta, obligatoria para ser Tech Provider, pide d
 | 2026-11-20 | 0.8 | Sección 17.1: 4 planes (Gratis, Emprende $19, Negocio $39 ⭐ como gancho, Pro $99) cobrados por mensajes de Teo, con base en los precios de context-gpt. D-10 parcialmente cerrada (falta la pasarela). Organización de GitHub `teo-wapp-org`. |
 | 2026-11-20 | 0.9 | Fase 0 implementada: repo `teo-wapp-org/teo`, Supabase `teo-dev` (ref `mczghfseqbccbkwepzrs`) con migraciones de fundaciones + RLS probada, design system de marca, landing con precios, registro/login, onboarding, panel del comercio (inicio, casos) y panel superadmin. Se desactivó `cacheComponents` de Next 16 (app dinámica por sesión). Pendiente: importar el proyecto en Vercel y configurar las URLs de Auth. |
 | 2026-11-20 | 0.10 | Producción en Vercel (team `teo-6a57`, plan Hobby): https://teo-lac-phi.vercel.app. Variables de Supabase cargadas; Auth con `site_url` y URLs de redirección configuradas. Pendiente antes de tener usuarios reales: SMTP propio (Resend), plantillas de correo en español y pasar Vercel a Pro (Hobby no permite uso comercial). |
+| 2026-11-21 | 0.x · WhatsApp | Integración con WhatsApp Cloud API (§8.2, D-18): Edge Functions `whatsapp-webhook` y `whatsapp-send` desplegadas en teo-dev, token por comercio en Vault, ingesta idempotente, statuses, envío con ventana de 24 h (pg_net + pg_cron), panel Configuración → WhatsApp (conexión manual, Embedded Signup preparado, desconectar) y simulador `scripts/wa-simulate`. Falta: app de Meta / Tech Provider. |
