@@ -11,3 +11,6 @@ supabase/.branches/
 
 # Vercel CLI
 web/.vercel/
+
+# Worktrees de subagentes
+.claude/worktrees/

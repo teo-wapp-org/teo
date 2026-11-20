@@ -9,10 +9,23 @@ export type Membership = {
   organization: { id: string; name: string; slug: string; status: "onboarding" | "activo" | "suspendido" };
 };
 
-export const getUser = cache(async () => {
+export type SessionUser = { id: string; email?: string; user_metadata: Record<string, unknown> };
+
+/**
+ * Usuario de la sesión a partir de los claims del JWT verificados (getClaims).
+ * Es el mismo criterio que usa el proxy: si usáramos getUser() (llamada de red a Auth) y Auth
+ * respondiera 429, el proxy diría "logueado" y la página "no logueado" → bucle de redirecciones.
+ */
+export const getUser = cache(async (): Promise<SessionUser | null> => {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  return data.user;
+  const { data } = await supabase.auth.getClaims();
+  const c = data?.claims;
+  if (!c?.sub) return null;
+  return {
+    id: c.sub,
+    email: typeof c.email === "string" ? c.email : undefined,
+    user_metadata: (c.user_metadata as Record<string, unknown> | undefined) ?? {},
+  };
 });
 
 export async function requireUser() {

@@ -22,7 +22,11 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
-    return { error: error.code === "email_not_confirmed" ? "Confirma tu correo antes de entrar." : "Correo o contraseña incorrectos." };
+    if (error.code === "email_not_confirmed") return { error: "Confirma tu correo antes de entrar." };
+    if (error.status === 429 || error.code === "over_request_rate_limit") {
+      return { error: "Demasiados intentos. Espera un momento y vuelve a intentarlo." };
+    }
+    return { error: "Correo o contraseña incorrectos." };
   }
   redirect(safeNext(formData.get("next")));
 }

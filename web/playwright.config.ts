@@ -13,7 +13,7 @@ export default defineConfig({
   timeout: 45_000,
   expect: { timeout: 10_000 },
   fullyParallel: true,
-  workers: process.env.CI ? 2 : 4,
+  workers: Number(process.env.E2E_WORKERS ?? (process.env.CI ? 2 : 3)),
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", { open: "never", outputFolder: "e2e-report" }]],
   globalTeardown: "./e2e/global-teardown.ts",
