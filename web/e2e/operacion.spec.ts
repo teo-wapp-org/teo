@@ -97,6 +97,7 @@ test("un usuario de otro comercio no ve el caso (404)", async ({ ownerPage: page
 });
 
 test("detalle: chat, enviar mensaje, tomar y devolver a Teo", async ({ ownerPage: page, owner, seed }) => {
+  test.setTimeout(90_000); // incluye la llamada real a agent/suggest (Edge Function)
   await page.goto(`/app/${owner.orgSlug}/casos/${seed.atencion.number}`);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Ana León");
   const chat = page.getByRole("log", { name: "Conversación" });
