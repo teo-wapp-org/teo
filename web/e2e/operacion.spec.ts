@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
-import { expect, test as base } from "./fixtures";
-import { createQaUser, seedOperacion, type OperacionSeed } from "./supabase-admin";
+import { expect, login, test as base } from "./fixtures";
+import { adminClient, createQaUser, seedOperacion, type OperacionSeed } from "./supabase-admin";
 
 /** Panel operativo (Fase 4) con datos sembrados en el comercio del owner. */
 const test = base.extend<{ seed: OperacionSeed }>({
@@ -61,8 +61,11 @@ test("kanban: mover a columna válida persiste; inválida vuelve con aviso", asy
   const live = (text: string) => expect(page.locator("[aria-live]", { hasText: text })).toHaveCount(1);
   await page.keyboard.press("Space");
   await live(`Caso #${seed.conversacion.number} sobre la columna En conversación`);
-  await page.keyboard.press("ArrowRight");
-  await live("sobre la columna Cotización");
+  // dnd-kit engancha las flechas un instante después de tomar la tarjeta: reintenta hasta que se mueva.
+  await expect(async () => {
+    await page.keyboard.press("ArrowRight");
+    await expect(page.locator("[aria-live]", { hasText: "sobre la columna Cotización" })).toHaveCount(1, { timeout: 1000 });
+  }).toPass({ timeout: 10_000 });
   await page.keyboard.press("Space");
   await expect(page.getByText(`Caso #${seed.conversacion.number} movido a “Cotización”`)).toBeVisible();
   await expect(column(page, "cotizacion").getByTestId(`caso-${seed.conversacion.number}`)).toBeVisible();
@@ -70,14 +73,87 @@ test("kanban: mover a columna válida persiste; inválida vuelve con aviso", asy
   // válida con ratón: nuevo → en conversación
   await dragTo(page, seed.nuevo.number, "en_conversacion");
   await expect(column(page, "en_conversacion").getByTestId(`caso-${seed.nuevo.number}`)).toBeVisible();
+  await expect(page.getByText(`Caso #${seed.nuevo.number} movido a “En conversación”`)).toBeVisible();
 
   await page.reload();
   await expect(column(page, "cotizacion").getByTestId(`caso-${seed.conversacion.number}`)).toBeVisible();
   await expect(column(page, "en_conversacion").getByTestId(`caso-${seed.nuevo.number}`)).toBeVisible();
 });
 
-test("un usuario de otro comercio no ve el caso (404)", async ({ ownerPage: page, seed }) => {
+test("un usuario de otro comercio no ve el caso (404)", async ({ ownerPage: page, owner, seed, browser }) => {
+  // El dueño sí lo ve; otro comercio (con sus propios casos) no puede abrirlo ni por URL.
+  const mine = await page.goto(`/app/${owner.orgSlug}/casos/${seed.nuevo.number}`);
+  expect(mine?.status()).toBe(200);
   const other = await createQaUser({ tag: "otro", withOrg: `QA Otro ${Date.now()}` });
-  const res = await page.goto(`/app/${other.orgSlug}/casos/${seed.nuevo.number}`);
+  await seedOperacion(other.orgId!);
+  const ctx = await browser.newContext();
+  const otherPage = await ctx.newPage();
+  await login(otherPage, other);
+  const res = await otherPage.goto(`/app/${owner.orgSlug}/casos/${seed.nuevo.number}`);
   expect(res?.status()).toBe(404);
+  const inexistente = await otherPage.goto(`/app/${other.orgSlug}/casos/99999`);
+  expect(inexistente?.status()).toBe(404);
+  await ctx.close();
+});
+
+test("detalle: chat, enviar mensaje, tomar y devolver a Teo", async ({ ownerPage: page, owner, seed }) => {
+  await page.goto(`/app/${owner.orgSlug}/casos/${seed.atencion.number}`);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Ana León");
+  const chat = page.getByRole("log", { name: "Conversación" });
+  await expect(chat).toContainText("Quiero hablar con una persona");
+
+  await page.getByRole("button", { name: "Pedir sugerencias" }).click();
+  await expect(page.getByText(/Sugerencias no disponibles|Usar sugerencia 1/)).toBeVisible({ timeout: 20_000 });
+
+  // Tomar (humano): se asigna al operador
+  await expect(page.getByTestId("atiende")).toContainText("Teo");
+  await page.getByRole("button", { name: "Tomar caso" }).click();
+  await expect(page.getByTestId("atiende")).toContainText("Humano");
+  await expect(page.getByRole("button", { name: "Devolver a Teo" })).toBeVisible();
+
+  // Enviar con Enter (simulador → queda 'sent')
+  const composer = page.getByLabel("Escribe una respuesta");
+  await composer.fill("Hola Ana, ya reviso tu pedido");
+  await composer.press("Enter");
+  const sent = chat.getByTestId("mensaje").filter({ hasText: "Hola Ana, ya reviso tu pedido" });
+  await expect(sent).toHaveAttribute("data-author", "operador");
+  await expect(sent.getByTestId("estado-mensaje")).toHaveAttribute("data-status", "sent");
+  await expect(composer).toHaveValue("");
+
+  // Devolver a Teo: sale de "Requiere atención" y vuelve al estado previo
+  await page.getByRole("button", { name: "Devolver a Teo" }).click();
+  await expect(page.getByTestId("atiende")).toContainText("Teo");
+  await expect(page.locator("header").getByText("En conversación")).toBeVisible();
+  await page.reload();
+  await expect(chat.getByTestId("mensaje").filter({ hasText: "Hola Ana, ya reviso tu pedido" })).toBeVisible();
+  await expect(chat.getByTestId("evento-caso").last()).toContainText("“En conversación”");
+});
+
+test("pagos: confirmar mueve a Confirmado; rechazar vuelve a Esperando pago", async ({ ownerPage: page, owner, seed }) => {
+  await page.goto(`/app/${owner.orgSlug}/casos/${seed.porConfirmar.number}`);
+  const pago = page.getByTestId("pago");
+  await expect(pago.getByRole("img", { name: "Comprobante de pago" })).toBeVisible();
+  await expect(pago).toContainText("Banco Pichincha");
+  await expect(page.getByTestId("total-pedido")).toContainText("$30,00");
+
+  // Rechazar con motivo
+  await pago.getByRole("button", { name: "Rechazar" }).click();
+  await page.getByLabel("Motivo del rechazo").fill("El monto no coincide");
+  await page.getByRole("button", { name: "Rechazar pago" }).click();
+  await expect(page.getByText("Pago rechazado.")).toBeVisible();
+  await expect(page.locator("header").getByText("Esperando pago")).toBeVisible();
+  await expect(pago).toContainText("Motivo: El monto no coincide");
+
+  // Nuevo comprobante → pago_por_confirmar → confirmar
+  const admin = adminClient();
+  const { data: order } = await admin.from("orders").select("id").eq("case_id", seed.porConfirmar.id).single();
+  await admin.from("payments").insert({ org_id: owner.orgId!, order_id: order!.id, declared_amount: 30 });
+  await admin.rpc("transition_case", { p_case: seed.porConfirmar.id, p_to: "pago_por_confirmar", p_actor: "teo" });
+  await page.reload();
+  await page.getByRole("button", { name: "Confirmar pago" }).click();
+  await expect(page.getByText("Pago confirmado.")).toBeVisible();
+  await expect(page.locator("header").getByText("Confirmado", { exact: true })).toBeVisible();
+
+  await page.goto(`/app/${owner.orgSlug}/casos`);
+  await expect(column(page, "confirmado").getByTestId(`caso-${seed.porConfirmar.number}`)).toBeVisible();
 });
