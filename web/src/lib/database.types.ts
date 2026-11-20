@@ -971,6 +971,51 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_secrets: {
+        Row: {
+          last4: string | null
+          name: string
+          updated_at: string
+          updated_by: string | null
+          vault_secret_id: string
+        }
+        Insert: {
+          last4?: string | null
+          name: string
+          updated_at?: string
+          updated_by?: string | null
+          vault_secret_id: string
+        }
+        Update: {
+          last4?: string | null
+          name?: string
+          updated_at?: string
+          updated_by?: string | null
+          vault_secret_id?: string
+        }
+        Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       product_categories: {
         Row: {
           created_at: string
@@ -1380,12 +1425,72 @@ export type Database = {
         }
         Returns: string
       }
+      admin_add_platform_admin: {
+        Args: {
+          p_email: string
+          p_role: Database["public"]["Enums"]["platform_role"]
+        }
+        Returns: string
+      }
+      admin_delete_secret: { Args: { p_name: string }; Returns: undefined }
+      admin_get_platform_config: { Args: never; Returns: Json }
+      admin_list_platform_admins: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          role: Database["public"]["Enums"]["platform_role"]
+          user_id: string
+        }[]
+      }
+      admin_remove_platform_admin: { Args: { p_user: string }; Returns: string }
+      admin_reset_usage: { Args: { p_org: string }; Returns: undefined }
+      admin_set_agent_enabled: {
+        Args: { p_enabled: boolean; p_org: string }
+        Returns: undefined
+      }
       admin_set_org_status: {
         Args: {
           p_org: string
           p_status: Database["public"]["Enums"]["org_status"]
         }
         Returns: undefined
+      }
+      admin_set_secret: {
+        Args: { p_name: string; p_value: string }
+        Returns: undefined
+      }
+      admin_set_setting: {
+        Args: { p_key: string; p_value: Json }
+        Returns: Json
+      }
+      admin_update_subscription: {
+        Args: {
+          p_org: string
+          p_period_end?: string
+          p_plan: string
+          p_status: Database["public"]["Enums"]["subscription_status"]
+          p_trial_ends_at?: string
+        }
+        Returns: {
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          org_id: string
+          plan_id: string
+          provider: string | null
+          provider_ref: string | null
+          status: Database["public"]["Enums"]["subscription_status"]
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "subscriptions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       apply_whatsapp_status: {
         Args: { p_error?: string; p_status: string; p_wamid: string }
@@ -1474,6 +1579,8 @@ export type Database = {
         Args: { p_conversation: string; p_delay?: number; p_org: string }
         Returns: number
       }
+      get_platform_config: { Args: never; Returns: Json }
+      get_platform_secret: { Args: { p_name: string }; Returns: string }
       get_whatsapp_token: { Args: { p_account: string }; Returns: string }
       has_org_role: {
         Args: {
@@ -1528,6 +1635,9 @@ export type Database = {
           user_id: string
         }[]
       }
+      platform_secret_names: { Args: never; Returns: string[] }
+      platform_setting_keys: { Args: never; Returns: string[] }
+      public_platform_config: { Args: never; Returns: Json }
       read_inbound: {
         Args: { p_qty?: number; p_vt?: number }
         Returns: {
