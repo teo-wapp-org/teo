@@ -69,3 +69,9 @@ export async function cleanupQa() {
     if (data.users.length < 200) break;
   }
 }
+
+/** Agrega un usuario existente a un comercio con el rol dado (vía service role, solo para preparar tests). */
+export async function addQaMember(orgId: string, userId: string, role: "owner" | "admin" | "operador") {
+  const { error } = await adminClient().from("memberships").insert({ org_id: orgId, user_id: userId, role });
+  if (error) throw error;
+}
