@@ -11,7 +11,7 @@
 // 4. Loop de herramientas (máx. 6 iteraciones, timeout total). Errores repetidos, refusal o
 //    exceso de iteraciones → escala a humano con un mensaje de cortesía.
 // 5. Guarda las respuestas en messages (queued si WhatsApp, sent si simulador), registra agent_runs
-//    e incrementa el uso (increment_teo_usage).
+//    e incrementa el uso (increment_teo_usage; el simulador no consume cupo).
 import { addUsage, emptyUsage, type LlmMessage, type LlmToolResultBlock, textOf, toolUsesOf } from "../llm/types.ts";
 import { escalateCase, ensureOpenCase, moveCase } from "./cases.ts";
 import { loadCaseState, loadOrgContext, quotaStatus } from "./context.ts";
@@ -195,8 +195,11 @@ export async function runAgentTurn(
     }
     const nowIso = deps.now().toISOString();
     await db.from("conversations").update({ last_message_at: nowIso }).eq("org_id", orgId).eq("id", conversationId);
-    const { error: usageErr } = await db.rpc("increment_teo_usage", { p_org: orgId, p_n: replies.length });
-    if (usageErr) log("usage_failed", { error: usageErr.message });
+    // El simulador no consume el cupo del plan (el costo real queda igual en agent_runs).
+    if (channel !== "simulador") {
+      const { error: usageErr } = await db.rpc("increment_teo_usage", { p_org: orgId, p_n: replies.length });
+      if (usageErr) log("usage_failed", { error: usageErr.message });
+    }
   }
 
   await db.from("agent_runs").insert({
