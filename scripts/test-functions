@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Tests (Deno) de las Edge Functions: lint, tipos y Deno.test. No tocan la red ni la base.
+set -euo pipefail
+cd "$(dirname "$0")/../supabase/functions"
+DENO=$(command -v deno || echo "$HOME/.deno/bin/deno")
+"$DENO" lint
+"$DENO" check */index.ts
+"$DENO" test --allow-env "$@"

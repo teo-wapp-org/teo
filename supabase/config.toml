@@ -394,3 +394,12 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 # declarative_schema_path = "./declarative"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# ─── Edge Functions de WhatsApp ───
+# Meta no envía JWT: el webhook valida X-Hub-Signature-256 (WHATSAPP_APP_SECRET).
+[functions.whatsapp-webhook]
+verify_jwt = false
+
+# La llama pg_net (trigger/pg_cron) con x-teo-send-secret leído de Vault (= WHATSAPP_SEND_SECRET).
+[functions.whatsapp-send]
+verify_jwt = false

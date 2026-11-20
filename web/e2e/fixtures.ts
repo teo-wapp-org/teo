@@ -26,21 +26,21 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
-  owner: async ({}, use, info) => {
-    await use(await createQaUser({ tag: `owner-${info.workerIndex}`, withOrg: `QA Tienda ${info.workerIndex}-${Date.now()}` }));
+  owner: async ({}, provide, info) => {
+    await provide(await createQaUser({ tag: `owner-${info.workerIndex}`, withOrg: `QA Tienda ${info.workerIndex}-${Date.now()}` }));
   },
-  ownerPage: async ({ page, owner }, use) => {
+  ownerPage: async ({ page, owner }, provide) => {
     await login(page, owner);
     await expect(page).toHaveURL(new RegExp(`/app/${owner.orgSlug}$`));
-    await use(page);
+    await provide(page);
   },
-  superadmin: async ({}, use, info) => {
-    await use(await createQaUser({ tag: `admin-${info.workerIndex}`, platformRole: "superadmin" }));
+  superadmin: async ({}, provide, info) => {
+    await provide(await createQaUser({ tag: `admin-${info.workerIndex}`, platformRole: "superadmin" }));
   },
-  adminPage: async ({ page, superadmin }, use) => {
+  adminPage: async ({ page, superadmin }, provide) => {
     await login(page, superadmin);
     await page.goto("/admin");
-    await use(page);
+    await provide(page);
   },
 });
 
