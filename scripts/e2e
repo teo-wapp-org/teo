@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Corre las pruebas E2E (Playwright) contra teo-dev.
+#   ./scripts/e2e                 → build + next start local
+#   ./scripts/e2e <url>           → contra un despliegue (p. ej. https://teo-lac-phi.vercel.app)
+#   ./scripts/e2e <url|""> -g "registro"   → argumentos extra para Playwright
+set -euo pipefail
+cd "$(dirname "$0")/.."
+REF=$(cat supabase/.temp/project-ref)
+KEYS=$(./scripts/supa projects api-keys --project-ref "$REF" -o json 2>/dev/null)
+pick() { python3 -c "import sys,json;print([k['api_key'] for k in json.load(sys.stdin) if $1][0])" <<<"$KEYS"; }
+export NEXT_PUBLIC_SUPABASE_URL="https://$REF.supabase.co"
+export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$(pick "k['type']=='publishable'")
+export SUPABASE_SERVICE_ROLE_KEY=$(pick "k['name']=='service_role'")
+URL="${1:-}"; shift || true
+cd web
+if [[ -n "$URL" ]]; then
+  E2E_BASE_URL="$URL" npx playwright test "$@"
+else
+  npm run build >/dev/null
+  npx playwright test "$@"
+fi

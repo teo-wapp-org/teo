@@ -8,3 +8,12 @@
 - Reglas de seguridad que no se negocian (vienen de los errores de context-gpt): RLS por membresía, sin políticas `USING (true)`; secretos solo en Vault o env; cada Server Action valida sesión, membresía y `org_id`; idempotencia por `wamid`.
 - **Supabase CLI:** para cualquier comando contra la nube (link, db push, functions deploy, secrets) usa siempre `./scripts/supa <comando>`, nunca `supabase` directo. El wrapper toma el token de la cuenta de Teo del Llavero de macOS, porque el login global apunta a otra cuenta. Para guardar o rotar el token: `./scripts/supa-set-token sbp_xxx`. Los comandos locales (`supabase start`, `supabase db reset`) funcionan con cualquiera de los dos.
 - **Vercel CLI:** usa siempre `./scripts/vc <comando>` (token de Teo en el Llavero, servicio `teo-vercel-token`). Para guardar o rotar el token: `./scripts/vc-set-token <token>`. El proyecto de Vercel tiene Root Directory `web`.
+
+## Flujo de trabajo (fase a fase)
+1. Migración nueva en `supabase/migrations/` → `./scripts/supa db push` (teo-dev).
+2. Tests SQL de RLS/dominio en `supabase/tests/*.sql` → `./scripts/test-db` (todo se revierte).
+3. Tipos: `./scripts/supa gen types typescript --linked --schema public > web/src/lib/database.types.ts`.
+4. `cd web && npm run lint && npm run typecheck`.
+5. E2E: `./scripts/e2e` (build + start local) o `./scripts/e2e https://teo-lac-phi.vercel.app` (producción). Los usuarios QA (`qa+e2e-*@teo.test`) se borran solos.
+6. Solo con todo en verde: commit y push a `main` (Vercel despliega solo) y `./scripts/smoke` contra producción.
+- Next 16: `cacheComponents` está desactivado. Nunca pasar componentes/funciones (p. ej. íconos de Lucide) de un Server Component a un Client Component: pasar el elemento ya renderizado.

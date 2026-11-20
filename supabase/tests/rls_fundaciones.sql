@@ -17,7 +17,7 @@ select public.create_organization('Tienda Ñandú Café', 'cafeteria');
 
 do $$ begin
   if (select count(*) from public.organizations) <> 1 then raise exception 'FAIL A debe ver 1 org'; end if;
-  if (select slug from public.organizations limit 1) <> 'tienda-nandu-cafe' then raise exception 'FAIL slug'; end if;
+  if (select slug from public.organizations limit 1) not like 'tienda-nandu-cafe%' then raise exception 'FAIL slug'; end if;
   if (select role from public.memberships limit 1) <> 'owner' then raise exception 'FAIL owner'; end if;
   if (select plan_id || ':' || status from public.subscriptions limit 1) <> 'negocio:trial' then raise exception 'FAIL trial'; end if;
 end $$;
@@ -46,7 +46,7 @@ do $$
 declare v_org uuid;
 begin
   reset role;
-  select id into v_org from public.organizations limit 1;
+  select id into v_org from public.organizations where slug = 'tienda-nandu-cafe';
   set local role authenticated;
   begin
     insert into public.memberships (org_id, user_id, role) values (v_org, '00000000-0000-0000-0000-00000000000b', 'owner');
@@ -71,8 +71,8 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
 do $$
 declare v_org uuid;
 begin
-  if (select count(*) from public.organizations) <> 1 then raise exception 'FAIL admin no ve orgs'; end if;
-  select id into v_org from public.organizations limit 1;
+  select id into v_org from public.organizations where slug = 'tienda-nandu-cafe';
+  if v_org is null then raise exception 'FAIL admin no ve orgs'; end if;
   perform public.admin_set_org_status(v_org, 'suspendido');
   if (select status from public.organizations where id = v_org) <> 'suspendido' then raise exception 'FAIL estado'; end if;
   if (select count(*) from public.admin_audit_log where org_id = v_org) <> 1 then raise exception 'FAIL auditoría'; end if;

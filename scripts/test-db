@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Corre los tests SQL (RLS y dominio) contra teo-dev. Cada test se revierte (no deja datos).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+fail=0
+for f in supabase/tests/*.sql; do
+  out=$(./scripts/supa db query --linked -f "$f" -o table --agent=no 2>&1 | grep -v 'new version\|recommend\|Initialising' || true)
+  if grep -q "_OK" <<<"$out"; then echo "OK    $f"; else echo "FAIL  $f"; echo "$out" | tail -3; fail=1; fi
+done
+exit $fail

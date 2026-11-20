@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 /** Días restantes hasta una fecha (servidor, por request). */
 function daysUntil(iso: string | null | undefined, now = new Date()) {
   if (!iso) return null;
-  return Math.max(0, Math.ceil((new Date(iso).getTime() - now.getTime()) / 86_400_000));
+  return Math.max(0, Math.round((new Date(iso).getTime() - now.getTime()) / 86_400_000));
 }
 
 export default async function OrgHome({ params }: PageProps<"/app/[org]">) {
