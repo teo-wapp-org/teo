@@ -234,6 +234,12 @@ export const ORG_STATUS_LABELS: Record<"onboarding" | "activo" | "suspendido", s
   suspendido: "Suspendido",
 };
 
+export const ORG_STATUS_CLS: Record<string, string> = {
+  onboarding: "bg-secondary text-secondary-foreground",
+  activo: "bg-cta text-cta-foreground",
+  suspendido: "bg-destructive text-white",
+};
+
 const optDate = z
   .string()
   .trim()
