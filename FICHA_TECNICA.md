@@ -847,6 +847,10 @@ Se toma como base el esquema de context-gpt (Starter a $29 con 500 mensajes al d
 | D-11 | Un caso abierto por contacto; una compra nueva abre un caso nuevo |
 | D-12 | El LLM nunca calcula precios ni totales: lo hace el backend |
 | D-13 | La confirmación de pago es manual en la Fase 1 |
+| D-18 | ✅ El agente usa la **Messages API con loop de herramientas propio** (no Tool Runner) detrás de una interfaz `LlmProvider`: `AnthropicProvider` (Opus 5.5, effort bajo, `fallbacks: "default"`) y `FakeProvider` determinista para tests y para el simulador sin API key. Se elige con `TEO_LLM_PROVIDER` (`anthropic` \| `fake`; por defecto `anthropic` si hay `ANTHROPIC_API_KEY`) |
+| D-19 | ✅ Exclusión por conversación en el worker con un **lease en DB** (`claim_conversation`/`release_conversation`), porque el advisory lock de `try_lock_conversation` dura una sola transacción y cada RPC es una transacción distinta |
+| D-20 | ✅ Las respuestas del **simulador no consumen el cupo** del plan (sí se registran en `agent_runs`) |
+| D-21 | ✅ Guardrail de precios en la salida: si la respuesta menciona un monto que no vino del contexto del comercio ni de una herramienta, no se envía; se responde "lo confirmo con el equipo" y el caso pasa a Requiere atención |
 
 ### Abiertas (necesitan respuesta)
 
@@ -965,3 +969,4 @@ La verificación del negocio en Meta, obligatoria para ser Tech Provider, pide d
 | 2026-11-20 | 0.8 | Sección 17.1: 4 planes (Gratis, Emprende $19, Negocio $39 ⭐ como gancho, Pro $99) cobrados por mensajes de Teo, con base en los precios de context-gpt. D-10 parcialmente cerrada (falta la pasarela). Organización de GitHub `teo-wapp-org`. |
 | 2026-11-20 | 0.9 | Fase 0 implementada: repo `teo-wapp-org/teo`, Supabase `teo-dev` (ref `mczghfseqbccbkwepzrs`) con migraciones de fundaciones + RLS probada, design system de marca, landing con precios, registro/login, onboarding, panel del comercio (inicio, casos) y panel superadmin. Se desactivó `cacheComponents` de Next 16 (app dinámica por sesión). Pendiente: importar el proyecto en Vercel y configurar las URLs de Auth. |
 | 2026-11-20 | 0.10 | Producción en Vercel (team `teo-6a57`, plan Hobby): https://teo-lac-phi.vercel.app. Variables de Supabase cargadas; Auth con `site_url` y URLs de redirección configuradas. Pendiente antes de tener usuarios reales: SMTP propio (Resend), plantillas de correo en español y pasar Vercel a Pro (Hobby no permite uso comercial). |
+| 2026-11-21 | 0.11 | Agente Teo (Fase 2 del plan): núcleo en `supabase/functions/_shared/agent` (prompt cacheable, 11 herramientas con validación estricta, `runAgentTurn`, sugerencias), Edge Functions `agent` (simulador y sugerencias) y `agent-runner` (cola pgmq, invocada por pg_cron cada 10 s con URL y secreto en Vault), migración `20261121030000_agent_runner.sql` y simulador en el panel. Decisiones D-18 a D-21. |
