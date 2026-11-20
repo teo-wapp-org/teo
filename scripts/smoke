@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Smoke test autenticado (crea y borra un usuario QA con su comercio). Uso: ./scripts/smoke [baseUrl]
+set -euo pipefail
+cd "$(dirname "$0")/.."
+REF=$(cat supabase/.temp/project-ref)
+KEYS=$(./scripts/supa projects api-keys --project-ref "$REF" -o json 2>/dev/null)
+export SB_URL="https://$REF.supabase.co"
+export SB_PUB=$(python3 -c "import sys,json;print([k['api_key'] for k in json.load(sys.stdin) if k['type']=='publishable'][0])" <<<"$KEYS")
+export SB_SECRET=$(python3 -c "import sys,json;print([k['api_key'] for k in json.load(sys.stdin) if k['name']=='service_role'][0])" <<<"$KEYS")
+exec node scripts/smoke-auth.mjs "${1:-https://teo-lac-phi.vercel.app}"

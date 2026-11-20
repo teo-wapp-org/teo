@@ -18,8 +18,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <span className="rounded bg-sidebar-primary px-1.5 py-0.5 text-[10px] font-bold uppercase text-sidebar-primary-foreground">Admin</span>
         </Link>
         <nav aria-label="Admin" className="flex flex-1 flex-col gap-1">
-          <SidebarLink href="/admin" label="Comercios" icon={Building2} exact />
-          <SidebarLink href="/admin/auditoria" label="Auditoría" icon={ScrollText} />
+          <SidebarLink href="/admin" label="Comercios" icon={<Building2 aria-hidden />} exact />
+          <SidebarLink href="/admin/auditoria" label="Auditoría" icon={<ScrollText aria-hidden />} />
         </nav>
         <div className="px-3 text-xs text-sidebar-foreground/60">Rol: {role}</div>
         <UserMenu email={user.email ?? ""} isPlatformAdmin={false} />

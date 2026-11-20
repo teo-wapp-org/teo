@@ -35,7 +35,7 @@ export default async function OrgLayout({ children, params }: LayoutProps<"/app/
         </div>
         <nav aria-label="Panel" className="flex flex-1 flex-col gap-1">
           {ORG_NAV.map((item) => (
-            <SidebarLink key={item.slug} href={item.slug ? `${base}/${item.slug}` : base} label={item.label} icon={item.icon} exact={!item.slug} />
+            <SidebarLink key={item.slug} href={item.slug ? `${base}/${item.slug}` : base} label={item.label} icon={<item.icon aria-hidden />} exact={!item.slug} />
           ))}
         </nav>
         <UserMenu email={user.email ?? ""} isPlatformAdmin={Boolean(platformRole)} />
