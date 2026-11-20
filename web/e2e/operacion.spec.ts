@@ -157,3 +157,51 @@ test("pagos: confirmar mueve a Confirmado; rechazar vuelve a Esperando pago", as
   await page.goto(`/app/${owner.orgSlug}/casos`);
   await expect(column(page, "confirmado").getByTestId(`caso-${seed.porConfirmar.number}`)).toBeVisible();
 });
+
+test("conversaciones, clientes, métricas y resumen con datos sembrados", async ({ ownerPage: page, owner, seed }) => {
+  const base = `/app/${owner.orgSlug}`;
+
+  // Inicio: resumen real y badge de "Requiere atención" en el menú
+  await page.goto(base);
+  await expect(page.getByTestId("resumen-esperando-pago")).toHaveText("$42,50");
+  await expect(page.getByTestId("resumen-conversaciones-hoy")).toHaveText(/^\d+$/);
+  await expect(page.getByRole("navigation", { name: "Panel" }).getByTestId("badge-atencion")).toContainText("1");
+
+  // Conversaciones: bandeja; con caso abierto lleva al caso
+  await page.getByRole("navigation", { name: "Panel" }).getByRole("link", { name: "Conversaciones" }).click();
+  await expect(page.getByTestId("conversacion")).toHaveCount(5);
+  await page.getByTestId("conversacion").filter({ hasText: "Pedro Gómez" }).click();
+  await expect(page).toHaveURL(`${base}/casos/${seed.conversacion.number}`);
+
+  // Clientes: lista, etiqueta, búsqueda y ficha con total gastado
+  await page.goto(`${base}/clientes`);
+  await expect(page.getByTestId("fila-cliente")).toHaveCount(5);
+  await page.getByRole("navigation", { name: "Filtrar por etiqueta" }).getByRole("link", { name: "mayorista" }).click();
+  await expect(page.getByTestId("fila-cliente")).toHaveCount(1);
+  await expect(page.getByTestId("fila-cliente")).toContainText("María Torres");
+  await page.goto(`${base}/clientes?q=Luc`);
+  const lucia = page.getByTestId("fila-cliente");
+  await expect(lucia).toHaveCount(1);
+  await expect(lucia).toContainText("$20,00");
+  await lucia.getByRole("link", { name: "Lucía Pérez" }).click();
+  await expect(page.getByTestId("total-gastado")).toHaveText("$20,00");
+  await expect(page.getByRole("link", { name: `#${seed.nuevo.number}` }).first()).toBeVisible();
+  await page.getByRole("button", { name: "Editar datos" }).click();
+  await page.getByLabel("Correo").fill("lucia@example.com");
+  await page.getByRole("button", { name: "Guardar cliente" }).click();
+  await expect(page.getByText("Cliente actualizado")).toBeVisible();
+  await expect(page.getByText("lucia@example.com")).toBeVisible();
+
+  // Métricas (30 días): 6 casos, 4 de venta (1 confirmado, 3 llegaron a pago), 1 cerrado sin intervención
+  await page.goto(`${base}/metricas`);
+  await expect(page.getByTestId("kpi-conversaciones")).toHaveText("5");
+  await expect(page.getByTestId("kpi-ventas")).toHaveText("$20,00");
+  await expect(page.getByTestId("kpi-conversion")).toHaveText("25 %");
+  await expect(page.getByTestId("kpi-llegada-pago")).toHaveText("75 %");
+  await expect(page.getByTestId("kpi-autonomia")).toHaveText("100 %");
+  await expect(page.getByTestId("kpi-confirmacion")).toHaveText("10 min");
+  await expect(page.getByTestId("estado-esperando_pago")).toContainText("1");
+  await expect(page.getByRole("figure", { name: "Casos nuevos por día" })).toBeVisible();
+  await page.getByRole("link", { name: "7 días" }).click();
+  await expect(page).toHaveURL(/r=7/);
+});

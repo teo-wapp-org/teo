@@ -75,3 +75,9 @@ export function initials(name: string | null | undefined): string {
   if (!parts.length) return "?";
   return (parts[0][0] + (parts[1]?.[0] ?? "")).toUpperCase();
 }
+
+/** Limpia una búsqueda para usarla en filtros `or`/`ilike` de PostgREST. */
+export function cleanSearch(q: string | string[] | undefined): string {
+  const v = Array.isArray(q) ? q[0] : q;
+  return (v ?? "").replace(/[,()*%\\:."']/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
+}

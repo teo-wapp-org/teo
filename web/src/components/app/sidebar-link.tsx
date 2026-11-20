@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 /** `icon` llega ya renderizado (<Icon />): no se pueden pasar componentes/funciones del servidor al cliente. */
-export function SidebarLink({ href, label, icon, exact }: { href: string; label: string; icon: React.ReactNode; exact?: boolean }) {
+export function SidebarLink({ href, label, icon, exact, badge }: { href: string; label: string; icon: React.ReactNode; exact?: boolean; badge?: { count: number; label: string } }) {
   const pathname = usePathname();
   const active = exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
   return (
@@ -21,6 +21,12 @@ export function SidebarLink({ href, label, icon, exact }: { href: string; label:
     >
       {icon}
       {label}
+      {badge && (
+        <span className="ml-auto rounded-full bg-destructive px-1.5 text-xs font-semibold text-white tabular-nums" data-testid="badge-atencion">
+          {badge.count}
+          <span className="sr-only"> {badge.label}</span>
+        </span>
+      )}
     </Link>
   );
 }

@@ -363,7 +363,7 @@ function Media({ m }: { m: ChatMessage }) {
   );
 }
 
-function Bubble({ m, authorLabel }: { m: ChatMessage; authorLabel: string }) {
+export function Bubble({ m, authorLabel }: { m: ChatMessage; authorLabel: string }) {
   const kind = authorKind(m.author === "user:me" ? "user:me" : m.author);
   if (kind === "sistema") {
     return <p className="py-1 text-center text-xs text-muted-foreground italic">{m.body}</p>;

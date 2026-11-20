@@ -5,12 +5,13 @@ import { ORG_NAV } from "@/components/app/nav";
 import { SidebarLink } from "@/components/app/sidebar-link";
 import { UserMenu } from "@/components/app/user-menu";
 import { getMemberships, getPlatformRole, requireOrg, requireUser } from "@/lib/auth";
+import { countAttention } from "@/lib/data/operacion";
 
 export default async function OrgLayout({ children, params }: LayoutProps<"/app/[org]">) {
   const { org: slug } = await params;
   const user = await requireUser();
   const { org, impersonating } = await requireOrg(slug);
-  const [memberships, platformRole] = await Promise.all([getMemberships(), getPlatformRole()]);
+  const [memberships, platformRole, attention] = await Promise.all([getMemberships(), getPlatformRole(), countAttention(org.id)]);
   const base = `/app/${org.slug}`;
 
   return (
@@ -35,7 +36,7 @@ export default async function OrgLayout({ children, params }: LayoutProps<"/app/
         </div>
         <nav aria-label="Panel" className="flex flex-1 flex-col gap-1">
           {ORG_NAV.map((item) => (
-            <SidebarLink key={item.slug} href={item.slug ? `${base}/${item.slug}` : base} label={item.label} icon={<item.icon aria-hidden />} exact={!item.slug} />
+            <SidebarLink key={item.slug} href={item.slug ? `${base}/${item.slug}` : base} label={item.label} icon={<item.icon aria-hidden />} exact={!item.slug} badge={item.slug === "casos" && attention > 0 ? { count: attention, label: "requieren atención" } : undefined} />
           ))}
         </nav>
         <UserMenu email={user.email ?? ""} isPlatformAdmin={Boolean(platformRole)} />

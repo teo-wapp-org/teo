@@ -3,6 +3,7 @@ import { CircleCheck, Circle, MessageCircle, Package, Settings, Store, Wallet, S
 import { Badge } from "@/components/ui/badge";
 import { requireOrg } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { ResumenOperacion } from "@/components/operacion/resumen";
 
 /** Días restantes hasta una fecha (servidor, por request). */
 function daysUntil(iso: string | null | undefined, now = new Date()) {
@@ -73,18 +74,7 @@ export default async function OrgHome({ params }: PageProps<"/app/[org]">) {
         </ol>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-3" aria-label="Resumen">
-        {[
-          { k: "Conversaciones hoy", v: "0" },
-          { k: "Esperando pago", v: "$0" },
-          { k: "Mensajes de Teo este mes", v: `0 / ${plan?.teo_messages_month?.toLocaleString("es-EC") ?? "—"}` },
-        ].map((s) => (
-          <div key={s.k} className="rounded-2xl border border-border bg-card p-5">
-            <p className="text-sm text-muted-foreground">{s.k}</p>
-            <p className="mt-1 font-heading text-3xl font-bold">{s.v}</p>
-          </div>
-        ))}
-      </section>
+      <ResumenOperacion orgId={org.id} base={base} />
     </div>
   );
 }
