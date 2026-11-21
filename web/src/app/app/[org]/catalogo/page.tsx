@@ -109,7 +109,7 @@ export default async function CatalogoPage({ params, searchParams }: PageProps<"
 
       {emptyCatalog ? (
         <section className="mx-auto grid max-w-lg place-items-center gap-4 rounded-2xl border border-dashed border-border bg-card px-6 py-16 text-center">
-          <Image src="/brand/personaje.png" alt="" width={152} height={155} className="size-20 rounded-3xl" />
+          <Image src="/brand/personaje.png" alt="" width={320} height={327} className="size-20 rounded-3xl" />
           <h2 className="text-2xl font-bold">Tu catálogo está vacío</h2>
           <p className="text-muted-foreground">
             Carga tus productos con precio y fotos. Teo los usará para responder a tus clientes y cerrar ventas por WhatsApp.

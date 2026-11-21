@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const jakarta = Plus_Jakarta_Sans({ variable: "--font-jakarta", subsets: ["latin"], weight: ["500", "600", "700", "800"] });
+
+export const viewport: Viewport = { viewportFit: "cover", themeColor: "#F5F8FC" };
 
 export const metadata: Metadata = {
   title: { default: "Teo · Convierte tus conversaciones en ventas", template: "%s · Teo" },

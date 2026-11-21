@@ -1,54 +1,54 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Building2, CreditCard, ScrollText, Settings, UsersRound } from "lucide-react";
+import { MobileShell, type ShellItem } from "@/components/app/mobile-shell";
+import { OrgSwitcher } from "@/components/app/org-switcher";
 import { SidebarLink } from "@/components/app/sidebar-link";
 import { UserMenu } from "@/components/app/user-menu";
 import { requirePlatformAdmin, requireUser } from "@/lib/auth";
+import { getSwitchableOrgs } from "@/lib/data/orgs";
 
 export const metadata = { title: "Admin" };
-
-function NavLinks() {
-  return (
-    <>
-      <SidebarLink href="/admin" label="Comercios" icon={<Building2 aria-hidden />} exact also={["/admin/comercios"]} />
-      <SidebarLink href="/admin/configuracion" label="Configuración" icon={<Settings aria-hidden />} />
-      <SidebarLink href="/admin/planes" label="Planes" icon={<CreditCard aria-hidden />} />
-      <SidebarLink href="/admin/equipo" label="Equipo Teo" icon={<UsersRound aria-hidden />} />
-      <SidebarLink href="/admin/auditoria" label="Auditoría" icon={<ScrollText aria-hidden />} />
-    </>
-  );
-}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
   const role = await requirePlatformAdmin();
+  const orgs = await getSwitchableOrgs();
+
+  const items: ShellItem[] = [
+    { href: "/admin", label: "Comercios", icon: <Building2 aria-hidden />, exact: true, also: ["/admin/comercios"] },
+    { href: "/admin/configuracion", label: "Configuración", shortLabel: "Config.", icon: <Settings aria-hidden /> },
+    { href: "/admin/planes", label: "Planes", icon: <CreditCard aria-hidden /> },
+    { href: "/admin/equipo", label: "Equipo Teo", shortLabel: "Equipo", icon: <UsersRound aria-hidden /> },
+    { href: "/admin/auditoria", label: "Auditoría", icon: <ScrollText aria-hidden /> },
+  ];
+  const switcher = <OrgSwitcher orgs={orgs} label="Ir a un comercio" placeholder="Elegir comercio…" />;
+  const footer = (
+    <div className="space-y-2">
+      <p className="px-3 text-xs text-sidebar-foreground/60">Rol: {role === "superadmin" ? "Superadmin" : "Soporte (solo lectura)"}</p>
+      <UserMenu email={user.email ?? ""} isPlatformAdmin={false} />
+    </div>
+  );
+
   return (
-    <div className="flex min-h-full flex-1 flex-col md:flex-row">
-      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-6 bg-sidebar p-4 text-sidebar-foreground md:flex">
+    <div className="flex min-h-full flex-1">
+      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-6 overflow-y-auto bg-sidebar p-4 text-sidebar-foreground md:flex">
         <Link href="/admin" className="flex items-center gap-2 px-2 pt-1">
-          <Image src="/brand/logo-oscuro.png" alt="Teo" width={128} height={52} className="h-8 w-auto" />
+          <Image src="/brand/logo-oscuro.png" alt="Teo" width={600} height={271} className="h-8 w-auto" />
           <span className="rounded bg-sidebar-primary px-1.5 py-0.5 text-[10px] font-bold uppercase text-sidebar-primary-foreground">Admin</span>
         </Link>
+        {switcher}
         <nav aria-label="Admin" className="flex flex-1 flex-col gap-1">
-          <NavLinks />
+          {items.map((it) => (
+            <SidebarLink key={it.href} href={it.href} label={it.label} icon={it.icon} exact={it.exact} also={it.also} />
+          ))}
         </nav>
-        <div className="px-3 text-xs text-sidebar-foreground/60">Rol: {role === "superadmin" ? "Superadmin" : "Soporte (solo lectura)"}</div>
-        <UserMenu email={user.email ?? ""} isPlatformAdmin={false} />
+        {footer}
       </aside>
-      {/* Móvil: barra superior con navegación desplazable */}
-      <header className="sticky top-0 z-20 space-y-2 bg-sidebar px-4 pt-3 pb-2 text-sidebar-foreground md:hidden">
-        <div className="flex items-center justify-between gap-2">
-          <Link href="/admin" className="flex items-center gap-2">
-            <Image src="/brand/logo-oscuro.png" alt="Teo" width={128} height={52} className="h-7 w-auto" />
-            <span className="rounded bg-sidebar-primary px-1.5 py-0.5 text-[10px] font-bold uppercase text-sidebar-primary-foreground">Admin</span>
-          </Link>
-          <span className="text-xs text-sidebar-foreground/60">{role === "superadmin" ? "Superadmin" : "Soporte"}</span>
-        </div>
-        <nav aria-label="Admin (móvil)" className="-mx-4 flex gap-1 overflow-x-auto px-4 pb-1">
-          <NavLinks />
-        </nav>
-      </header>
-      <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <MobileShell homeHref="/admin" title={role === "superadmin" ? "Superadmin" : "Soporte"} badgeLabel="Admin" items={items} top={switcher} footer={footer} />
+        <main className="min-w-0 flex-1 p-4 pb-28 sm:p-6 sm:pb-28 md:pb-6 lg:p-8">{children}</main>
+      </div>
     </div>
   );
 }

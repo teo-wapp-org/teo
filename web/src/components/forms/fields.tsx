@@ -121,7 +121,7 @@ export function FormError({ error }: { error?: string }) {
 export function EmptyState({ title, children, action }: { title: string; children?: React.ReactNode; action?: React.ReactNode }) {
   return (
     <div className="grid place-items-center gap-3 rounded-2xl border border-dashed border-border bg-card px-6 py-12 text-center">
-      <Image src="/brand/personaje.png" alt="" width={152} height={155} className="size-20 rounded-3xl" />
+      <Image src="/brand/personaje.png" alt="" width={320} height={327} className="size-20 rounded-3xl" />
       <h2 className="text-lg font-semibold">{title}</h2>
       {children && <div className="max-w-md text-sm text-muted-foreground">{children}</div>}
       {action}

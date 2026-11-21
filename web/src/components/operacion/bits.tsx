@@ -71,7 +71,7 @@ export function MemberAvatar({ member, size = "sm" }: { member: MemberLite | nul
 export function EmptyState({ title, children, className }: { title: string; children?: React.ReactNode; className?: string }) {
   return (
     <div className={cn("mx-auto grid max-w-md place-items-center gap-3 py-12 text-center", className)}>
-      <Image src="/brand/personaje.png" alt="" width={152} height={155} className="size-16 rounded-2xl" />
+      <Image src="/brand/personaje.png" alt="" width={320} height={327} className="size-16 rounded-2xl" />
       <p className="font-heading text-lg font-semibold">{title}</p>
       {children && <div className="text-sm text-muted-foreground">{children}</div>}
     </div>

@@ -3,7 +3,7 @@ import { BarChart3, FlaskConical, Home, Layers, MessageCircle, Package, Settings
 export const ORG_NAV = [
   { slug: "", label: "Inicio", icon: Home },
   { slug: "casos", label: "Casos", icon: Layers },
-  { slug: "conversaciones", label: "Conversaciones", icon: MessageCircle },
+  { slug: "conversaciones", label: "Conversaciones", shortLabel: "Chats", icon: MessageCircle },
   { slug: "clientes", label: "Clientes", icon: Users },
   { slug: "catalogo", label: "Catálogo", icon: Package },
   { slug: "tiendas", label: "Tiendas", icon: Store },

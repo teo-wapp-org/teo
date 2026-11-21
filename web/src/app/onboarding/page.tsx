@@ -15,7 +15,7 @@ export default async function OnboardingPage() {
         <Logo href="/app" />
         <div className="mt-10 rounded-2xl border border-border bg-card p-6 sm:p-8">
           <div className="mb-6 flex items-center gap-4">
-            <Image src="/brand/personaje.png" alt="Teo" width={152} height={155} className="size-14 rounded-2xl" />
+            <Image src="/brand/personaje.png" alt="Teo" width={320} height={327} className="size-14 rounded-2xl" />
             <div>
               <h1 className="text-2xl font-bold">¡Hola{name ? `, ${name}` : ""}! Soy Teo.</h1>
               <p className="text-muted-foreground">Empecemos por lo básico: cuéntame de tu negocio.</p>

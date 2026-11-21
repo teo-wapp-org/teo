@@ -90,7 +90,7 @@ export default async function LandingPage() {
           <div className="relative mx-auto w-full max-w-sm">
             <div className="rounded-3xl border border-primary-foreground/10 bg-[#0E2747] p-4 shadow-2xl">
               <div className="mb-4 flex items-center gap-3 border-b border-primary-foreground/10 pb-3">
-                <Image src="/brand/personaje.png" alt="" width={152} height={155} className="size-10 rounded-full" />
+                <Image src="/brand/personaje.png" alt="" width={320} height={327} className="size-10 rounded-full" />
                 <div>
                   <p className="text-sm font-semibold">Café Ñandú</p>
                   <p className="text-xs text-cta">en línea · atendido por Teo</p>
@@ -227,7 +227,7 @@ export default async function LandingPage() {
       {/* CTA FINAL */}
       <section className="px-4 pb-20">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 rounded-3xl bg-primary px-6 py-14 text-center text-primary-foreground">
-          <Image src="/brand/personaje.png" alt="Teo, el asistente" width={152} height={155} className="size-20 rounded-2xl" />
+          <Image src="/brand/personaje.png" alt="Teo, el asistente" width={320} height={327} className="size-20 rounded-2xl" />
           <h2 className="text-3xl font-bold sm:text-4xl">¡Hola! Soy Teo. ¿Vendemos?</h2>
           <p className="max-w-xl text-primary-foreground/80">Crea tu cuenta, carga tu negocio y deja que tu WhatsApp trabaje por ti.</p>
           <Link href="/registro" className={cn(buttonVariants({ variant: "cta" }), "h-12 px-8 text-base")}>

@@ -10,7 +10,7 @@ export default async function SectionPlaceholder({ params }: PageProps<"/app/[or
   const item = ORG_NAV.find((n) => n.slug === section)!;
   return (
     <div className="mx-auto grid max-w-lg place-items-center gap-4 py-24 text-center">
-      <Image src="/brand/personaje.png" alt="" width={152} height={155} className="size-20 rounded-3xl" />
+      <Image src="/brand/personaje.png" alt="" width={320} height={327} className="size-20 rounded-3xl" />
       <h1 className="text-2xl font-bold">{item.label}</h1>
       <p className="text-muted-foreground">Estamos construyendo esta sección. Muy pronto podrás gestionarla desde aquí.</p>
     </div>

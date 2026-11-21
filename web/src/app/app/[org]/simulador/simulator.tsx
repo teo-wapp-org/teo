@@ -120,7 +120,7 @@ export function Simulator({ orgId, orgName }: { orgId: string; orgName: string }
       {/* Chat estilo WhatsApp */}
       <section aria-label="Chat de prueba" className="flex h-[70dvh] min-h-[480px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <header className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground">
-          <Image src="/brand/personaje.png" alt="" width={152} height={155} className="size-9 rounded-full bg-white/10 object-cover" />
+          <Image src="/brand/personaje.png" alt="" width={320} height={327} className="size-9 rounded-full bg-white/10 object-cover" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">{orgName}</p>
             <p className="text-xs text-primary-foreground/70" aria-live="polite">{busy ? "escribiendo…" : "Atendido por Teo · simulador"}</p>

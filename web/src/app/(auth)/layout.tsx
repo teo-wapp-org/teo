@@ -12,7 +12,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
       <aside className="relative hidden flex-col justify-end overflow-hidden bg-primary p-12 text-primary-foreground lg:flex">
         <div aria-hidden className="absolute -right-24 -top-24 size-96 rounded-full bg-cta/20 blur-3xl" />
-        <Image src="/brand/personaje.png" alt="" width={152} height={155} className="mb-8 size-24 rounded-3xl" />
+        <Image src="/brand/personaje.png" alt="" width={320} height={327} className="mb-8 size-24 rounded-3xl" />
         <p className="font-heading text-3xl font-bold leading-tight">
           Tus conversaciones. Tus clientes.
           <br />
