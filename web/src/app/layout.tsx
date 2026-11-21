@@ -9,6 +9,8 @@ const jakarta = Plus_Jakarta_Sans({ variable: "--font-jakarta", subsets: ["latin
 
 export const viewport: Viewport = {
   viewportFit: "cover",
+  // Android/Chrome: el teclado redimensiona el contenido en lugar de taparlo
+  interactiveWidget: "resizes-content",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#F5F8FC" },
     { media: "(prefers-color-scheme: dark)", color: "#07152A" },

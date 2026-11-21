@@ -166,3 +166,24 @@
     bottom: 1rem;
   }
 }
+
+/*
+ * iOS Safari hace zoom automático al enfocar un campo con fuente < 16 px y "descuadra" la página.
+ * En pantallas táctiles/angostas todos los campos de texto usan 16 px.
+ */
+@media (max-width: 47.99rem), (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Con el teclado abierto (un campo enfocado en móvil) se oculta la barra inferior y la barra de acciones baja. */
+html[data-keyboard="open"] [data-mobile-bottom-nav] {
+  transform: translateY(110%);
+  pointer-events: none;
+}
+html[data-keyboard="open"] .sticky-actions {
+  bottom: 0.5rem;
+}

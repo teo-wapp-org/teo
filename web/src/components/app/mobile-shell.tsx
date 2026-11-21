@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -43,6 +43,28 @@ export function MobileShell({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  // Teclado virtual: al enfocar un campo de texto en móvil se marca <html data-keyboard="open">
+  // (CSS oculta la barra inferior para que no flote sobre el teclado ni tape el campo).
+  useEffect(() => {
+    const isField = (el: EventTarget | null) =>
+      el instanceof HTMLElement &&
+      (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "SELECT" ||
+        (el.tagName === "INPUT" && !["checkbox", "radio", "range", "button", "submit", "file", "color"].includes((el as HTMLInputElement).type)));
+    const mq = window.matchMedia("(max-width: 47.99rem)");
+    const onIn = (e: FocusEvent) => { if (mq.matches && isField(e.target)) document.documentElement.dataset.keyboard = "open"; };
+    const onOut = () => {
+      // el foco puede saltar a otro campo: se revisa en el siguiente tick
+      setTimeout(() => { if (!isField(document.activeElement)) delete document.documentElement.dataset.keyboard; }, 0);
+    };
+    document.addEventListener("focusin", onIn);
+    document.addEventListener("focusout", onOut);
+    return () => {
+      document.removeEventListener("focusin", onIn);
+      document.removeEventListener("focusout", onOut);
+      delete document.documentElement.dataset.keyboard;
+    };
+  }, []);
 
   const isActive = (it: ShellItem) =>
     it.exact ? pathname === it.href || (it.also ?? []).some((p) => pathname.startsWith(p)) : pathname === it.href || pathname.startsWith(`${it.href}/`);
@@ -88,7 +110,8 @@ export function MobileShell({
 
       <nav
         aria-label="Navegación inferior"
-        className="fixed inset-x-0 bottom-0 z-30 grid border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+        data-mobile-bottom-nav
+        className="fixed inset-x-0 bottom-0 z-30 grid transition-transform duration-150 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
         style={{ gridTemplateColumns: `repeat(${bottom.length + 1}, minmax(0, 1fr))` }}
       >
         {bottom.map((it) => (

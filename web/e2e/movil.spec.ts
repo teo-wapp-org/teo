@@ -49,3 +49,27 @@ test("móvil: superadmin entra al admin y cambia de comercio", async ({ page, ow
   await expect(page).toHaveURL(`/app/${owner.orgSlug}`);
   await expect(page.getByRole("status").filter({ hasText: "como equipo Teo" })).toBeVisible();
 });
+
+test("móvil: teclado sin zoom de iOS y sin barra inferior encima", async ({ ownerPage: page, owner }) => {
+  for (const path of ["simulador", "tiendas/nueva", "catalogo/nuevo", "configuracion"]) {
+    await page.goto(`/app/${owner.orgSlug}/${path}`);
+    const sizes = await page.$$eval(
+      'input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]), textarea, select',
+      (els) => els.filter((e) => (e as HTMLElement).offsetParent !== null).map((e) => parseFloat(getComputedStyle(e).fontSize)),
+    );
+    expect(sizes.length, `${path}: hay campos`).toBeGreaterThan(0);
+    expect(Math.min(...sizes), `${path}: fuente mínima 16px (evita zoom en iOS)`).toBeGreaterThanOrEqual(16);
+  }
+
+  await page.goto(`/app/${owner.orgSlug}/simulador`);
+  const bar = page.getByRole("navigation", { name: "Navegación inferior" });
+  await expect(bar).toBeInViewport();
+  await page.getByPlaceholder("Escribe un mensaje").focus();
+  await expect(page.locator("html")).toHaveAttribute("data-keyboard", "open");
+  await expect(bar).not.toBeInViewport();
+  await page.getByPlaceholder("Escribe un mensaje").blur();
+  await expect(page.locator("html")).not.toHaveAttribute("data-keyboard", "open");
+  await expect(bar).toBeInViewport();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});
