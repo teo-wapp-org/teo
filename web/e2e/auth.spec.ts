@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { login } from "./fixtures";
-import { qaEmail } from "./supabase-admin";
+import type { Json } from "../src/lib/database.types";
+import { adminClient, qaEmail } from "./supabase-admin";
+
+// En serie: el test de "registro cerrado" cambia un ajuste global de la plataforma por unos segundos.
+test.describe.configure({ mode: "serial" });
 
 test("registro → onboarding → panel del comercio → salir → login", async ({ page }) => {
   const email = qaEmail("signup");
@@ -45,4 +49,22 @@ test("registro valida términos", async ({ page }) => {
   await page.getByLabel("Contraseña").fill("password-seguro-1");
   await page.getByRole("button", { name: "Crear cuenta" }).click();
   await expect(page.getByRole("alert").filter({ hasText: "términos" })).toBeVisible();
+});
+
+test("registro cerrado desde /admin: /registro muestra el aviso y no ofrece el formulario", async ({ page }) => {
+  const admin = adminClient();
+  const { data: row, error } = await admin.from("platform_settings").select("value").eq("key", "signup").single();
+  expect(error).toBeNull();
+  const original = row!.value as { [key: string]: Json | undefined };
+  try {
+    const { error: e1 } = await admin.from("platform_settings").update({ value: { ...original, enabled: false } }).eq("key", "signup");
+    expect(e1).toBeNull();
+    await page.goto("/registro");
+    await expect(page.getByRole("heading", { name: "El registro está cerrado por ahora" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Crear cuenta" })).toHaveCount(0);
+  } finally {
+    await admin.from("platform_settings").update({ value: original }).eq("key", "signup");
+  }
+  await page.goto("/registro");
+  await expect(page.getByRole("button", { name: "Crear cuenta" })).toBeVisible();
 });
