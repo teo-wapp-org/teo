@@ -4,6 +4,7 @@ import { getCase } from "./cases.ts";
 import { loadCaseState, loadOrgContext } from "./context.ts";
 import { buildHistory, buildVolatile, systemBlocks, type HistoryMessage } from "./prompt.ts";
 import { sanitizeReply } from "./text.ts";
+import { resolveAgentDeps } from "./runtime.ts";
 import type { AgentDeps } from "./types.ts";
 
 export type Suggestion = { id: string; text: string; actions: SuggestionAction[] };
@@ -52,9 +53,10 @@ export async function loadCaseHistory(deps: AgentDeps, orgId: string, caseId: st
 }
 
 export async function generateSuggestions(
-  deps: AgentDeps,
+  baseDeps: AgentDeps,
   p: { orgId: string; caseId: string; n?: number },
 ): Promise<Suggestion[]> {
+  const deps = await resolveAgentDeps(baseDeps);
   const n = Math.min(Math.max(p.n ?? 3, 1), 3);
   const t0 = Date.now();
   const c = await getCase(deps.db, p.orgId, p.caseId); // valida que el caso sea del comercio
@@ -115,7 +117,8 @@ Modo copiloto: NO respondes tú al cliente. Propón ${n} respuestas alternativas
     org_id: p.orgId, case_id: p.caseId, kind: "suggestion", model: model || deps.llm.name,
     input_tokens: usage.inputTokens, output_tokens: usage.outputTokens,
     cache_read_tokens: usage.cacheReadTokens, cache_write_tokens: usage.cacheWriteTokens,
-    latency_ms: Date.now() - t0, tools: [], stop_reason: error ? "error" : "end_turn", error,
+    latency_ms: Date.now() - t0, tools: [], stop_reason: error ? "error" : "end_turn",
+    error: error ?? (deps.configError ? `config: ${deps.configError}` : null),
   });
   if (error) deps.log?.("suggest_error", { caseId: p.caseId, error });
   return out;

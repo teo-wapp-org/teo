@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { getPublicConfig } from "@/lib/data/platform-config";
 import { createClient } from "@/lib/supabase/server";
 
 export type AuthState = { error?: string; message?: string };
@@ -39,6 +40,7 @@ const SignupSchema = z.object({
 });
 
 export async function signup(_: AuthState, formData: FormData): Promise<AuthState> {
+  if (!(await getPublicConfig()).signup_enabled) return { error: "El registro está cerrado por ahora." };
   const parsed = SignupSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 

@@ -1,7 +1,8 @@
 "use client";
 
 // Embedded Signup de Meta: carga el SDK de Facebook, abre el popup de alta y envía el `code`
-// (más phone_number_id y waba_id recibidos por postMessage) al endpoint del servidor.
+// (más phone_number_id y waba_id recibidos por postMessage) al endpoint del servidor, que lo pasa a la
+// Edge Function whatsapp-connect (app secret en Vault).
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
@@ -20,11 +21,11 @@ declare global {
   }
 }
 
-function loadSdk(appId: string): Promise<FBSDK> {
+function loadSdk(appId: string, version: string): Promise<FBSDK> {
   return new Promise((resolve, reject) => {
     if (window.FB) return resolve(window.FB);
     window.fbAsyncInit = () => {
-      window.FB!.init({ appId, autoLogAppEvents: true, xfbml: false, version: GRAPH_VERSION });
+      window.FB!.init({ appId, autoLogAppEvents: true, xfbml: false, version });
       resolve(window.FB!);
     };
     const s = document.createElement("script");
@@ -37,7 +38,17 @@ function loadSdk(appId: string): Promise<FBSDK> {
   });
 }
 
-export function EmbeddedSignupButton({ slug, appId, configId }: { slug: string; appId?: string; configId?: string }) {
+export function EmbeddedSignupButton({
+  slug,
+  appId,
+  configId,
+  graphVersion = GRAPH_VERSION,
+}: {
+  slug: string;
+  appId?: string | null;
+  configId?: string | null;
+  graphVersion?: string;
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ kind: "error" | "ok"; text: string } | null>(null);
@@ -80,7 +91,7 @@ export function EmbeddedSignupButton({ slug, appId, configId }: { slug: string; 
     setBusy(true);
     setMsg(null);
     try {
-      const FB = await loadSdk(appId!);
+      const FB = await loadSdk(appId!, graphVersion);
       FB.login(
         (r) => {
           const code = r.authResponse?.code;

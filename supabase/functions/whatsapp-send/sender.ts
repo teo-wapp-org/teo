@@ -24,6 +24,8 @@ export interface SendDeps {
   /** Libera el reclamo para que el barrido lo reintente. */
   release(id: string): Promise<void>;
   fetch?: FetchFn;
+  /** Versión de la Graph API vigente (ajuste meta.graph_version). */
+  graphVersion?(): Promise<string>;
   now(): Date;
   waitUntil(p: Promise<unknown>): void;
   log: Logger;
@@ -54,7 +56,8 @@ export async function sendOne(row: OutboundRow, deps: SendDeps): Promise<SendOut
   const token = await deps.getToken(target.account.id);
   if (!token) return fail("sin_token");
 
-  const client = new WhatsAppClient({ token, phoneNumberId: target.account.phone_number_id, fetch: deps.fetch });
+  const graphVersion = deps.graphVersion ? await deps.graphVersion() : undefined;
+  const client = new WhatsAppClient({ token, phoneNumberId: target.account.phone_number_id, fetch: deps.fetch, graphVersion });
   const replyTo = typeof row.payload?.reply_to === "string" ? row.payload.reply_to : null;
   try {
     const wamid = await client.send(target.wa_id, message, replyTo);

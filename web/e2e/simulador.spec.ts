@@ -1,7 +1,7 @@
 import { expect, test } from "./fixtures";
 import { adminClient } from "./supabase-admin";
 
-// Requiere la Edge Function `agent` desplegada en teo-dev con TEO_LLM_PROVIDER=fake (respuestas deterministas).
+// Requiere la Edge Function `agent` desplegada en teo-dev con el ajuste ai.provider = fake (respuestas deterministas).
 test("simulador: consulta → esperando pago → requiere atención", async ({ ownerPage: page, owner }) => {
   test.setTimeout(120_000);
   const { error } = await adminClient().from("products").insert({ org_id: owner.orgId!, name: "Torta de chocolate", price: 18.5, description: "Torta húmeda" });

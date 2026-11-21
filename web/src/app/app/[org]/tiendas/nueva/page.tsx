@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { requireOrg } from "@/lib/auth";
 import { atLimit, getPlanLimits } from "@/lib/data/plan-limits";
 import { canEditConfig } from "@/lib/org-editor";
-import { placesConfigured } from "@/lib/places";
+import { getPublicConfig } from "@/lib/data/platform-config";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyState } from "@/components/forms/fields";
 import { buttonVariants } from "@/components/ui/button";
@@ -17,13 +17,14 @@ export default async function NuevaTiendaPage({ params }: PageProps<"/app/[org]/
   const ctx = await requireOrg(slug);
   if (!canEditConfig(ctx)) notFound();
   const supabase = await createClient();
-  const [limits, { count }] = await Promise.all([
+  const [limits, { count }, config] = await Promise.all([
     getPlanLimits(supabase, ctx.org.id),
     supabase.from("stores").select("id", { count: "exact", head: true }).eq("org_id", ctx.org.id),
+    getPublicConfig(),
   ]);
   const list = `/app/${ctx.org.slug}/tiendas`;
 
-  const places: PlacesAvailability = !placesConfigured()
+  const places: PlacesAvailability = !config.places_available
     ? { enabled: false, label: "Disponible pronto", reason: "Muy pronto podrás traer tus datos desde Google." }
     : !limits.features.includes("google_places")
       ? { enabled: false, label: "Buscar en Google", reason: "Importar desde Google está disponible desde el plan Emprende." }

@@ -67,6 +67,42 @@ Deno.test("GET: verificación del challenge", async () => {
   assertEquals(bad.status, 403);
 });
 
+Deno.test("secretos de la config de la plataforma: tienen prioridad sobre los valores fijos", async () => {
+  const delays: number[] = [];
+  const { deps } = fakeDeps({
+    appSecret: "",
+    verifyToken: "",
+    secrets: () => Promise.resolve({ appSecret: "secreto-vault", verifyToken: "token-vault" }),
+    debounceSeconds: () => Promise.resolve(9),
+    enqueue: (_o, _c, d) => {
+      delays.push(d);
+      return Promise.resolve();
+    },
+  });
+  const ok = await handleRequest(new Request("https://x/?hub.mode=subscribe&hub.verify_token=token-vault&hub.challenge=7"), deps);
+  assertEquals([ok.status, await ok.text()], [200, "7"]);
+  const bad = await handleRequest(new Request("https://x/?hub.mode=subscribe&hub.verify_token=verify-me&hub.challenge=7"), deps);
+  assertEquals(bad.status, 403);
+
+  const body = JSON.stringify(webhookPayload({ phoneNumberId: "111", messages: [textMessage("5939", "hola")] }));
+  assertEquals((await post(deps, body)).status, 401); // firmado con el secreto viejo
+  const res = await handleRequest(
+    new Request("https://x/", { method: "POST", body, headers: { "X-Hub-Signature-256": await signBody("secreto-vault", body) } }),
+    deps,
+  );
+  assertEquals(res.status, 200);
+  await processPayload(JSON.parse(body), deps);
+  assertEquals(delays, [9]); // debounce = ai.debounce_seconds
+});
+
+Deno.test("sin secretos configurados: verificación y firma se rechazan", async () => {
+  const { deps } = fakeDeps({ secrets: () => Promise.resolve({ appSecret: "", verifyToken: "" }) });
+  const res = await handleRequest(new Request("https://x/?hub.mode=subscribe&hub.verify_token=&hub.challenge=7"), deps);
+  assertEquals(res.status, 403);
+  const body = "{}";
+  assertEquals((await post(deps, body)).status, 401);
+});
+
 Deno.test("POST: firma inválida o ausente → 401 y no procesa", async () => {
   const { deps, pending } = fakeDeps();
   const body = JSON.stringify(webhookPayload({ phoneNumberId: "111", messages: [textMessage("5939", "hola")] }));

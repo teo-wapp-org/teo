@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireOrg } from "@/lib/auth";
+import { getPublicConfig } from "@/lib/data/platform-config";
 import { createClient } from "@/lib/supabase/server";
 import { fetchPhoneNumber } from "@/lib/whatsapp/graph";
 
@@ -39,6 +40,9 @@ export async function connectWhatsappManual(_: WaActionState, formData: FormData
 
   const ctx = await requireManager(slug);
   if (!ctx) return { error: "Solo el dueño o un administrador puede conectar WhatsApp." };
+  if (!(await getPublicConfig()).whatsapp_manual_connection) {
+    return { error: "La conexión manual no está disponible. Usa «Conectar con Facebook»." };
+  }
 
   // Validamos el token contra Meta desde el servidor. Si Meta no lo acepta (p. ej. aún no hay app aprobada),
   // se guarda como "pendiente": el webhook solo atiende números conectados.

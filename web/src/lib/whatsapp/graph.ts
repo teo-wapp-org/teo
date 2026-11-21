@@ -1,13 +1,19 @@
 import "server-only";
-import { GRAPH_BASE } from "./constants";
+import { getPublicConfig } from "@/lib/data/platform-config";
+import { graphBase } from "./constants";
 
 export type PhoneInfo = { display_phone_number?: string; verified_name?: string; quality_rating?: string };
 type GraphResult<T> = { ok: true; data: T } | { ok: false; reason: string };
 
-/** Llama a la Graph API desde el servidor. Nunca incluye el token en el motivo de error. */
+/**
+ * Llama a la Graph API desde el servidor (versión = ajuste meta.graph_version). Nunca incluye el token
+ * en el motivo de error. El intercambio del code del Embedded Signup (que necesita el app secret)
+ * vive en la Edge Function `whatsapp-connect`.
+ */
 async function graph<T>(path: string, token: string | null, init: RequestInit = {}): Promise<GraphResult<T>> {
   try {
-    const res = await fetch(`${GRAPH_BASE}/${path}`, {
+    const base = graphBase((await getPublicConfig()).meta_graph_version);
+    const res = await fetch(`${base}/${path}`, {
       ...init,
       headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(init.body ? { "Content-Type": "application/json" } : {}) },
       signal: AbortSignal.timeout(8_000),
@@ -27,23 +33,4 @@ async function graph<T>(path: string, token: string | null, init: RequestInit = 
 /** Valida el token: GET /{phone_number_id}?fields=display_phone_number,verified_name,quality_rating */
 export function fetchPhoneNumber(phoneNumberId: string, token: string) {
   return graph<PhoneInfo>(`${encodeURIComponent(phoneNumberId)}?fields=display_phone_number,verified_name,quality_rating`, token);
-}
-
-/** Embedded Signup: intercambia el `code` del popup de Facebook por el token de negocio del comercio. */
-export function exchangeCode(code: string, appId: string, appSecret: string) {
-  const qs = new URLSearchParams({ client_id: appId, client_secret: appSecret, code });
-  return graph<{ access_token: string }>(`oauth/access_token?${qs}`, null);
-}
-
-/** Suscribe la app de Teo a los webhooks de la WABA del comercio. */
-export function subscribeApp(wabaId: string, token: string) {
-  return graph<{ success: boolean }>(`${encodeURIComponent(wabaId)}/subscribed_apps`, token, { method: "POST" });
-}
-
-/** Registra el número en la Cloud API (no aplica a números en coexistencia con la app de WhatsApp Business). */
-export function registerPhone(phoneNumberId: string, token: string, pin: string) {
-  return graph<{ success: boolean }>(`${encodeURIComponent(phoneNumberId)}/register`, token, {
-    method: "POST",
-    body: JSON.stringify({ messaging_product: "whatsapp", pin }),
-  });
 }

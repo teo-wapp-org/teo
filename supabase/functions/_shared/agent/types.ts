@@ -7,10 +7,20 @@ export type AgentDeps = {
   db: SupabaseClient;
   llm: LlmProvider;
   now: () => Date;
-  /** Tiempo máximo del turno completo (todas las iteraciones). Por defecto 45 s. */
+  /** Tiempo máximo del turno completo (todas las iteraciones). Por defecto 45 s (ajuste ai.timeout_ms). */
   timeoutMs?: number;
+  /** Máximo de iteraciones del loop de herramientas. Por defecto 6 (ajuste ai.max_tool_iterations). */
+  maxToolIterations?: number;
+  /** Interruptor global de la IA (ajuste ai.enabled). false → Teo no responde, solo sugiere. */
+  aiEnabled?: boolean;
+  /** Error de configuración (p. ej. falta la key de Anthropic → se usó fake). Se registra en agent_runs. */
+  configError?: string | null;
+  /** Resuelve llm y ajustes desde la configuración de la plataforma en cada turno (ver runtime.ts). */
+  runtime?: () => Promise<AgentRuntime>;
   log?: (event: string, data?: Record<string, unknown>) => void;
 };
+
+export type AgentRuntime = Pick<AgentDeps, "llm" | "timeoutMs" | "maxToolIterations" | "aiEnabled" | "configError">;
 
 export type OutboundReply = {
   messageId: string;
@@ -19,7 +29,7 @@ export type OutboundReply = {
   mediaUrl?: string;
 };
 
-export type SkipReason = "humano" | "desactivado" | "copiloto" | "cupo_agotado" | "suspendido" | "sin_mensajes";
+export type SkipReason = "humano" | "ia_pausada" | "desactivado" | "copiloto" | "cupo_agotado" | "suspendido" | "sin_mensajes";
 
 export type AgentTurnResult = {
   replies: OutboundReply[];

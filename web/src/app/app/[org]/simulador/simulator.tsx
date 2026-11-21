@@ -21,7 +21,7 @@ type SimMessage = {
 
 type SimState = {
   replies: { messageId: string; type: string; body: string }[];
-  skipped: "humano" | "desactivado" | "copiloto" | "cupo_agotado" | "suspendido" | "sin_mensajes" | null;
+  skipped: "humano" | "ia_pausada" | "desactivado" | "copiloto" | "cupo_agotado" | "suspendido" | "sin_mensajes" | null;
   handled_by: "teo" | "humano";
   agent: { enabled: boolean; mode: "piloto" | "copiloto" };
   case: { id: string; number: number; status: string; type: string; open: boolean } | null;
@@ -44,6 +44,7 @@ function notices(s: SimState | null): { tone: "info" | "warn"; text: string }[] 
   if (s.agent.mode === "copiloto") out.push({ tone: "info", text: "Teo está en modo copiloto: genera sugerencias y una persona envía las respuestas." });
   if (s.handled_by === "humano") out.push({ tone: "warn", text: "La conversación pasó a una persona del equipo. Teo solo sugiere respuestas." });
   if (s.skipped === "cupo_agotado") out.push({ tone: "warn", text: "Se agotaron los mensajes de tu plan: Teo pasó a modo copiloto." });
+  if (s.skipped === "ia_pausada") out.push({ tone: "warn", text: "El equipo de Teo pausó las respuestas automáticas por un momento: Teo solo sugiere." });
   if (s.skipped === "suspendido") out.push({ tone: "warn", text: "El comercio está suspendido: Teo no responde." });
   return out;
 }
