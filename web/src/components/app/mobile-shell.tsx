@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Menu, MoreHorizontal } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { SidebarLink } from "@/components/app/sidebar-link";
+import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 
 export type ShellItem = {
@@ -50,9 +51,7 @@ export function MobileShell({
   return (
     <>
       <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-card/95 px-4 backdrop-blur md:hidden">
-        <Link href={homeHref} className="shrink-0" aria-label="Inicio">
-          <Image src="/brand/logo-claro.png" alt="Teo" width={600} height={271} className="h-8 w-auto" priority />
-        </Link>
+        <Logo href={homeHref} className="h-8" />
         {badgeLabel && (
           <span className="rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold uppercase text-primary-foreground">{badgeLabel}</span>
         )}

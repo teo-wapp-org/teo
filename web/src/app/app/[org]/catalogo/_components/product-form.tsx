@@ -543,7 +543,7 @@ export function ProductForm({ slug, orgId, mode, initial, categories: initialCat
         </div>
       )}
 
-      <div className="sticky bottom-0 z-10 -mx-4 flex flex-col-reverse gap-2 border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:mx-0 sm:flex-row sm:items-center sm:justify-between sm:rounded-2xl sm:border">
+      <div className="sticky-actions -mx-4 flex flex-col-reverse gap-2 border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:mx-0 sm:flex-row sm:items-center sm:justify-between sm:rounded-2xl sm:border">
         <div>
           {mode === "update" && !readOnly && (
             <Dialog>

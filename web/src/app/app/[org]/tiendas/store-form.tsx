@@ -124,7 +124,7 @@ export function StoreForm({ slug, initial, places }: { slug: string; initial: St
             )}
           </Section>
 
-          <div className="sticky bottom-16 z-10 flex justify-end gap-2 md:bottom-4">
+          <div className="sticky-actions -mx-2 flex justify-end rounded-xl bg-background/85 p-2 backdrop-blur supports-backdrop-filter:bg-background/70 gap-2">
             <Link href={list} className={buttonVariants({ variant: "outline", size: "lg", className: "h-11 bg-card px-5" })}>
               Cancelar
             </Link>

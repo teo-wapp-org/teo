@@ -119,13 +119,13 @@ export function Simulator({ orgId, orgName }: { orgId: string; orgName: string }
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       {/* Chat estilo WhatsApp */}
       <section aria-label="Chat de prueba" className="flex h-[70dvh] min-h-[480px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-        <header className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground">
+        <header className="flex items-center gap-3 bg-navy px-4 py-3 text-navy-foreground">
           <Image src="/brand/personaje.png" alt="" width={320} height={327} className="size-9 rounded-full bg-white/10 object-cover" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">{orgName}</p>
-            <p className="text-xs text-primary-foreground/70" aria-live="polite">{busy ? "escribiendo…" : "Atendido por Teo · simulador"}</p>
+            <p className="text-xs text-navy-foreground/70" aria-live="polite">{busy ? "escribiendo…" : "Atendido por Teo · simulador"}</p>
           </div>
-          <Button type="button" variant="ghost" size="sm" className="text-primary-foreground hover:bg-white/10 hover:text-primary-foreground" disabled={busy} onClick={() => call({ reset: true })}>
+          <Button type="button" variant="ghost" size="sm" className="text-navy-foreground hover:bg-white/10 hover:text-navy-foreground" disabled={busy} onClick={() => call({ reset: true })}>
             <RotateCcw aria-hidden /> Reiniciar conversación
           </Button>
         </header>

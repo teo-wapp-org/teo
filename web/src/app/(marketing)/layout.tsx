@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
 import { getUser } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -45,6 +46,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
               Tus conversaciones. Tus clientes. Todo bajo control.
             </p>
           </div>
+          <ThemeToggle className="self-start md:order-last" />
           <nav aria-label="Legal" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
             <Link href="/privacidad" className="hover:text-foreground">Política de privacidad</Link>
             <Link href="/terminos" className="hover:text-foreground">Términos de servicio</Link>

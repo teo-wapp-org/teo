@@ -59,7 +59,7 @@ export default async function LandingPage() {
   return (
     <>
       {/* HERO */}
-      <section className="relative overflow-hidden bg-primary text-primary-foreground">
+      <section className="relative overflow-hidden bg-navy text-navy-foreground">
         <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 size-96 rounded-full bg-cta/20 blur-3xl" />
         <div aria-hidden className="pointer-events-none absolute -bottom-32 right-0 size-[28rem] rounded-full bg-secondary/20 blur-3xl" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 md:grid-cols-[1.1fr_0.9fr] md:py-28">
@@ -68,7 +68,7 @@ export default async function LandingPage() {
             <h1 className="text-4xl font-extrabold leading-[1.05] sm:text-5xl md:text-6xl">
               Convierte tus conversaciones en <span className="text-cta">ventas</span>.
             </h1>
-            <p className="max-w-xl text-lg text-primary-foreground/80">
+            <p className="max-w-xl text-lg text-navy-foreground/80">
               Teo atiende el WhatsApp de tu negocio, responde al instante, arma el pedido y lo deja listo para el pago.
               Tú solo confirmas.
             </p>
@@ -78,18 +78,18 @@ export default async function LandingPage() {
               </Link>
               <Link
                 href="/login"
-                className={cn(buttonVariants({ variant: "outline" }), "h-12 border-primary-foreground/30 bg-transparent px-6 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground")}
+                className={cn(buttonVariants({ variant: "outline" }), "h-12 border-navy-foreground/30 bg-transparent px-6 text-base text-navy-foreground hover:bg-navy-foreground/10 hover:text-navy-foreground")}
               >
                 Ya tengo cuenta
               </Link>
             </div>
-            <p className="text-sm text-primary-foreground/60">{trialDays > 0 ? `${trialDays} días gratis · Sin tarjeta` : "Sin tarjeta"}</p>
+            <p className="text-sm text-navy-foreground/60">{trialDays > 0 ? `${trialDays} días gratis · Sin tarjeta` : "Sin tarjeta"}</p>
           </div>
 
           {/* Mock del chat */}
           <div className="relative mx-auto w-full max-w-sm">
-            <div className="rounded-3xl border border-primary-foreground/10 bg-[#0E2747] p-4 shadow-2xl">
-              <div className="mb-4 flex items-center gap-3 border-b border-primary-foreground/10 pb-3">
+            <div className="rounded-3xl border border-navy-foreground/10 bg-[#0E2747] p-4 shadow-2xl">
+              <div className="mb-4 flex items-center gap-3 border-b border-navy-foreground/10 pb-3">
                 <Image src="/brand/personaje.png" alt="" width={320} height={327} className="size-10 rounded-full" />
                 <div>
                   <p className="text-sm font-semibold">Café Ñandú</p>
@@ -98,11 +98,11 @@ export default async function LandingPage() {
               </div>
               <div className="space-y-3 text-sm">
                 <p className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-[#1F5C4B] px-3 py-2">Hola! tienen torta de chocolate para hoy?</p>
-                <p className="w-fit max-w-[85%] rounded-2xl rounded-bl-sm bg-primary-foreground/10 px-3 py-2">
+                <p className="w-fit max-w-[85%] rounded-2xl rounded-bl-sm bg-navy-foreground/10 px-3 py-2">
                   ¡Hola! Sí 🎂 Tenemos la torta de chocolate entera a $18 o por porción a $3,50. ¿Para retirar o te la enviamos?
                 </p>
                 <p className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-[#1F5C4B] px-3 py-2">Entera, para envío a La Carolina</p>
-                <p className="w-fit max-w-[85%] rounded-2xl rounded-bl-sm bg-primary-foreground/10 px-3 py-2">
+                <p className="w-fit max-w-[85%] rounded-2xl rounded-bl-sm bg-navy-foreground/10 px-3 py-2">
                   Perfecto: torta entera $18 + envío $2,50 = <strong>$20,50</strong>. Te paso los datos para la transferencia 👇
                 </p>
               </div>
@@ -176,7 +176,7 @@ export default async function LandingPage() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {BENEFICIOS.map((b) => (
             <div key={b.title} className="flex gap-4">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-cta">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-navy text-cta">
                 <b.icon className="size-5" aria-hidden />
               </span>
               <div>
@@ -226,10 +226,10 @@ export default async function LandingPage() {
 
       {/* CTA FINAL */}
       <section className="px-4 pb-20">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 rounded-3xl bg-primary px-6 py-14 text-center text-primary-foreground">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 rounded-3xl bg-navy px-6 py-14 text-center text-navy-foreground">
           <Image src="/brand/personaje.png" alt="Teo, el asistente" width={320} height={327} className="size-20 rounded-2xl" />
           <h2 className="text-3xl font-bold sm:text-4xl">¡Hola! Soy Teo. ¿Vendemos?</h2>
-          <p className="max-w-xl text-primary-foreground/80">Crea tu cuenta, carga tu negocio y deja que tu WhatsApp trabaje por ti.</p>
+          <p className="max-w-xl text-navy-foreground/80">Crea tu cuenta, carga tu negocio y deja que tu WhatsApp trabaje por ti.</p>
           <Link href="/registro" className={cn(buttonVariants({ variant: "cta" }), "h-12 px-8 text-base")}>
             Crear cuenta gratis <ArrowRight data-icon="inline-end" />
           </Link>

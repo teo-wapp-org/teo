@@ -9,6 +9,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-heading: var(--font-jakarta);
+  --color-navy: var(--navy);
+  --color-navy-foreground: var(--navy-foreground);
   --color-cta: var(--cta);
   --color-cta-foreground: var(--cta-foreground);
   --color-warning: var(--warning);
@@ -72,6 +74,8 @@
   --border: #E2E8F0;
   --input: #E2E8F0;
   --ring: #00D97E;
+  --navy: #0B1F3A;                /* Azul Teo fijo: superficies de marca (hero, login, simulador) */
+  --navy-foreground: #F5F8FC;
   --cta: #00D97E;                 /* Verde Inteligente: solo fondo, nunca texto sobre claro */
   --cta-foreground: #0B1F3A;
   --warning: #F59E0B;
@@ -93,7 +97,10 @@
   --sidebar-ring: #00D97E;
 }
 
+
 .dark {
+  --navy: #0B1F3A;
+  --navy-foreground: #F5F8FC;
   --background: #07152A;
   --foreground: #F5F8FC;
   --card: #0B1F3A;
@@ -147,5 +154,15 @@
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+/* Barra de acciones fija de los formularios: en móvil queda POR ENCIMA de la barra inferior de navegación. */
+@utility sticky-actions {
+  position: sticky;
+  z-index: 20;
+  bottom: calc(4.5rem + env(safe-area-inset-bottom) + 0.5rem);
+  @media (width >= 48rem) {
+    bottom: 1rem;
   }
 }

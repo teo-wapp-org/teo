@@ -137,7 +137,7 @@ export function PlanEditor({ plan, mode, canEdit }: { plan: PlanRow; mode: "crea
           </Section>
 
           {canEdit && (
-            <div className="sticky bottom-4 z-10 flex justify-end">
+            <div className="sticky-actions -mx-2 flex justify-end rounded-xl bg-background/85 p-2 backdrop-blur supports-backdrop-filter:bg-background/70">
               <Button type="submit" variant="cta" size="lg" className="h-11 px-6 text-base shadow-md">
                 {pending && <Loader2 className="animate-spin" data-icon="inline-start" />}
                 {mode === "create" ? "Crear plan" : "Guardar plan"}

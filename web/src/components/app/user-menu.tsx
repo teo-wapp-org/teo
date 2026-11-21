@@ -1,5 +1,6 @@
 import { LogOut, Shield } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function UserMenu({ email, isPlatformAdmin }: { email: string; isPlatformAdmin: boolean }) {
   return (
@@ -9,6 +10,10 @@ export function UserMenu({ email, isPlatformAdmin }: { email: string; isPlatform
           <Shield className="size-4 text-sidebar-primary" aria-hidden /> Admin Teo
         </Link>
       )}
+      <div className="flex items-center justify-between gap-2 px-3 py-1">
+        <span className="text-xs text-sidebar-foreground/60">Tema</span>
+        <ThemeToggle tone="sidebar" />
+      </div>
       <p className="truncate px-3 text-xs text-sidebar-foreground/60" title={email}>{email}</p>
       <form action="/auth/salir" method="post">
         <button type="submit" className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground">
