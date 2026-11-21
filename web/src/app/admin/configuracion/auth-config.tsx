@@ -27,7 +27,6 @@ export function AuthConfigPanel({ canEdit, hasToken }: { canEdit: boolean; hasTo
 
   useEffect(() => {
     if (hasToken) load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasToken]);
 
   if (!hasToken) {

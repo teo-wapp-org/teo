@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { requirePlatformAdmin } from "@/lib/auth";
-import { formatDate, formatMoney, formatNumber } from "@/lib/format";
+import { daysAgoIso, formatDate, formatMoney, formatNumber } from "@/lib/format";
 import { ORG_STATUS_CLS, ORG_STATUS_LABELS, SUBSCRIPTION_LABELS } from "@/lib/schemas/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -25,7 +25,7 @@ export default async function AdminComercioPage({ params }: PageProps<"/admin/co
   const { data: org } = await supabase.from("organizations").select("id, name, slug, rubro, status, created_at, timezone, currency").eq("id", id).maybeSingle();
   if (!org) notFound();
 
-  const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
+  const since = daysAgoIso(30);
   const [members, sub, usage, agent, wa, cases, messages, sales, runs, plans] = await Promise.all([
     supabase.rpc("org_members", { p_org: id }),
     supabase.from("subscriptions").select("plan_id, status, trial_ends_at, current_period_start, current_period_end, plan:plans(name, teo_messages_month)").eq("org_id", id).maybeSingle(),
