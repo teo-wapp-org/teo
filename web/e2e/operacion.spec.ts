@@ -121,7 +121,10 @@ test("detalle: chat, enviar mensaje, tomar y devolver a Teo", async ({ ownerPage
   await expect(sent.getByTestId("estado-mensaje")).toHaveAttribute("data-status", "sent");
   await expect(composer).toHaveValue("");
 
-  // Devolver a Teo: sale de "Requiere atención" y vuelve al estado previo
+  // Devolver a Teo: sale de "Requiere atención" y vuelve al estado previo.
+  // Los toasts (sonner) se quedan mientras el puntero está encima y tapan el botón: se aleja el mouse y se esperan.
+  await page.mouse.move(0, 0);
+  await expect(page.locator("[data-sonner-toast]")).toHaveCount(0, { timeout: 15_000 });
   await page.getByRole("button", { name: "Devolver a Teo" }).click();
   await expect(page.getByTestId("atiende")).toContainText("Teo");
   await expect(page.locator("header").getByText("En conversación")).toBeVisible();
