@@ -17,6 +17,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { FEATURE_LABELS, fmtLimit, getPlans } from "@/lib/data/plans";
+import { getPublicConfig } from "@/lib/data/platform-config";
 
 const PASOS = [
   { icon: Store, title: "Carga tu negocio", text: "Productos, fotos, tiendas, horarios y formas de pago. Importa tu perfil de Google en un clic." },
@@ -51,7 +52,8 @@ const PREGUNTAS = [
 ];
 
 export default async function LandingPage() {
-  const plans = await getPlans().catch(() => []);
+  const [plans, { trial_days: trialDays }] = await Promise.all([getPlans().catch(() => []), getPublicConfig()]);
+  const trialLabel = trialDays === 1 ? "1 día" : `${trialDays} días`;
 
   return (
     <>
@@ -80,7 +82,9 @@ export default async function LandingPage() {
                 Ya tengo cuenta
               </Link>
             </div>
-            <p className="text-sm text-primary-foreground/60">14 días del plan Negocio gratis · Sin tarjeta</p>
+            <p className="text-sm text-primary-foreground/60">
+              {trialDays > 0 ? `${trialLabel} del plan Negocio gratis · Sin tarjeta` : "Sin tarjeta"}
+            </p>
           </div>
 
           {/* Mock del chat */}
@@ -226,7 +230,7 @@ export default async function LandingPage() {
                   href={`/registro?plan=${p.id}`}
                   className={cn(buttonVariants({ variant: p.highlighted ? "cta" : "outline" }), "mt-6 h-11")}
                 >
-                  {p.price_usd_month === 0 ? "Empezar gratis" : "Probar 14 días gratis"}
+                  {p.price_usd_month === 0 ? "Empezar gratis" : trialDays > 0 ? `Probar ${trialLabel} gratis` : "Elegir este plan"}
                 </Link>
               </div>
             ))}

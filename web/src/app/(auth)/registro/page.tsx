@@ -2,17 +2,49 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getPublicConfig } from "@/lib/data/platform-config";
 import { signup } from "../actions";
 import { AuthForm } from "../auth-form";
 
 export const metadata: Metadata = { title: "Crear cuenta" };
 
-export default function RegistroPage() {
+const SIGNUP_CLOSED_MESSAGE = "El registro está cerrado por ahora";
+
+export default async function RegistroPage() {
+  const config = await getPublicConfig();
+  if (!config.signup_enabled) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">{SIGNUP_CLOSED_MESSAGE}</h1>
+          <p className="mt-2 text-muted-foreground">
+            Estamos preparando todo para recibir nuevos comercios. Vuelve pronto
+            {config.support_email ? (
+              <>
+                {" "}o escríbenos a{" "}
+                <a href={`mailto:${config.support_email}`} className="font-semibold text-foreground underline-offset-4 hover:underline">
+                  {config.support_email}
+                </a>
+              </>
+            ) : null}
+            .
+          </p>
+        </div>
+        <p className="text-center text-sm text-muted-foreground">
+          ¿Ya tienes cuenta?{" "}
+          <Link href="/login" className="font-semibold text-foreground underline-offset-4 hover:underline">Inicia sesión</Link>
+        </p>
+      </div>
+    );
+  }
+  const days = config.trial_days;
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Crea tu cuenta</h1>
-        <p className="mt-1 text-muted-foreground">14 días del plan Negocio gratis. Sin tarjeta.</p>
+        <p className="mt-1 text-muted-foreground">
+          {days > 0 ? `${days === 1 ? "1 día" : `${days} días`} del plan Negocio gratis. Sin tarjeta.` : "Empieza en minutos. Sin tarjeta."}
+        </p>
       </div>
       <AuthForm action={signup} submitLabel="Crear cuenta">
         <div className="space-y-2">
