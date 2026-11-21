@@ -5,6 +5,7 @@ import { DisconnectButton } from "@/components/whatsapp/disconnect-button";
 import { EmbeddedSignupButton } from "@/components/whatsapp/embedded-signup-button";
 import { ManualConnectForm } from "@/components/whatsapp/manual-connect-form";
 import { requireOrg } from "@/lib/auth";
+import { getPublicConfig } from "@/lib/data/platform-config";
 import { createClient } from "@/lib/supabase/server";
 import { QUALITY_LABEL, STATUS_LABEL, type WaAccountStatus } from "@/lib/whatsapp/constants";
 
@@ -32,7 +33,7 @@ export default async function WhatsappSettingsPage({ params }: PageProps<"/app/[
   const supabase = await createClient();
 
   const since = windowStart();
-  const [{ data: account }, { count: openWindows }] = await Promise.all([
+  const [{ data: account }, { count: openWindows }, config] = await Promise.all([
     supabase
       .from("whatsapp_accounts")
       .select("phone_number_id, waba_id, display_phone_number, verified_name, status, quality_rating, connected_at, updated_at")
@@ -46,6 +47,7 @@ export default async function WhatsappSettingsPage({ params }: PageProps<"/app/[
       .eq("org_id", org.id)
       .eq("channel", "whatsapp")
       .gt("last_inbound_at", since),
+    getPublicConfig(),
   ]);
 
   const status = (account?.status ?? null) as WaAccountStatus | null;
@@ -125,16 +127,23 @@ export default async function WhatsappSettingsPage({ params }: PageProps<"/app/[
             <p className="mb-4 text-sm text-muted-foreground">
               La forma recomendada: inicias sesión con Facebook, eliges tu cuenta de WhatsApp Business y tu número queda listo en minutos.
             </p>
-            <EmbeddedSignupButton slug={org.slug} appId={process.env.NEXT_PUBLIC_META_APP_ID} configId={process.env.NEXT_PUBLIC_META_ES_CONFIG_ID} />
+            <EmbeddedSignupButton
+              slug={org.slug}
+              appId={config.meta_app_id}
+              configId={config.meta_es_config_id}
+              graphVersion={config.meta_graph_version}
+            />
           </section>
 
-          <section aria-labelledby="manual" className="rounded-2xl border border-border bg-card p-6">
-            <h2 id="manual" className="text-xl font-semibold">{active ? "Actualizar conexión manual" : "Conexión manual"}</h2>
-            <p className="mb-4 text-sm text-muted-foreground">
-              Si ya tienes una app en Meta for Developers, copia aquí los datos de WhatsApp → Configuración de la API.
-            </p>
-            <ManualConnectForm slug={org.slug} defaultPhoneNumberId={active ? (account?.phone_number_id ?? undefined) : undefined} defaultWabaId={active ? (account?.waba_id ?? undefined) : undefined} />
-          </section>
+          {config.whatsapp_manual_connection && (
+            <section aria-labelledby="manual" className="rounded-2xl border border-border bg-card p-6">
+              <h2 id="manual" className="text-xl font-semibold">{active ? "Actualizar conexión manual" : "Conexión manual"}</h2>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Si ya tienes una app en Meta for Developers, copia aquí los datos de WhatsApp → Configuración de la API.
+              </p>
+              <ManualConnectForm slug={org.slug} defaultPhoneNumberId={active ? (account?.phone_number_id ?? undefined) : undefined} defaultWabaId={active ? (account?.waba_id ?? undefined) : undefined} />
+            </section>
+          )}
         </>
       ) : (
         <p role="note" className="flex items-center gap-2 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">

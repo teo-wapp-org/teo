@@ -1,6 +1,7 @@
-// Versión de la Graph API de Meta. Mantener igual que supabase/functions/_shared/whatsapp/constants.ts.
+// Versión de la Graph API de Meta por defecto. La efectiva es el ajuste meta.graph_version
+// (public_platform_config().meta_graph_version), administrado desde /admin.
 export const GRAPH_VERSION = "v24.0";
-export const GRAPH_BASE = `https://graph.facebook.com/${GRAPH_VERSION}`;
+export const graphBase = (version?: string | null) => `https://graph.facebook.com/${version || GRAPH_VERSION}`;
 
 export type WaAccountStatus = "pendiente" | "conectado" | "desconectado" | "error";
 
