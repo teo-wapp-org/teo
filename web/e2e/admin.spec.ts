@@ -7,12 +7,14 @@ test("superadmin ve comercios, suspende/reactiva y queda auditado", async ({ adm
   await expect(row).toBeVisible();
 
   await row.getByRole("button", { name: "Suspender" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Suspender" }).click();
   await expect(row.getByText("suspendido")).toBeVisible();
   await row.getByRole("button", { name: "Reactivar" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Reactivar" }).click();
   await expect(row.getByText("activo", { exact: true })).toBeVisible();
 
   await page.getByRole("link", { name: "Auditoría" }).click();
-  await expect(page.getByRole("cell", { name: "org.set_status" }).first()).toBeVisible();
+  await expect(page.getByRole("cell", { name: /Cambió el estado del comercio/ }).first()).toBeVisible();
 });
 
 test("superadmin puede ver un comercio en modo impersonación", async ({ adminPage: page, owner }) => {

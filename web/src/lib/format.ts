@@ -39,6 +39,11 @@ export function timeAgo(iso: string | null | undefined, now = Date.now()): strin
   return `hace ${formatDuration(diff)}`;
 }
 
+/** ISO de hace N días (para filtros de "últimos N días"). */
+export function daysAgoIso(days: number, now = Date.now()): string {
+  return new Date(now - days * 86_400_000).toISOString();
+}
+
 export function formatTime(iso: string): string {
   return new Intl.DateTimeFormat("es-EC", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso));
 }

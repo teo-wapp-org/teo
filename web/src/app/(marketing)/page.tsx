@@ -16,7 +16,9 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { FEATURE_LABELS, fmtLimit, getPlans } from "@/lib/data/plans";
+import { getPlans } from "@/lib/data/plans";
+import { getPublicConfig } from "@/lib/data/public-config";
+import { PlanCard } from "@/components/plan-card";
 
 const PASOS = [
   { icon: Store, title: "Carga tu negocio", text: "Productos, fotos, tiendas, horarios y formas de pago. Importa tu perfil de Google en un clic." },
@@ -51,7 +53,8 @@ const PREGUNTAS = [
 ];
 
 export default async function LandingPage() {
-  const plans = await getPlans().catch(() => []);
+  const [plans, pub] = await Promise.all([getPlans().catch(() => []), getPublicConfig()]);
+  const trialDays = pub.trial_days;
 
   return (
     <>
@@ -80,7 +83,7 @@ export default async function LandingPage() {
                 Ya tengo cuenta
               </Link>
             </div>
-            <p className="text-sm text-primary-foreground/60">14 días del plan Negocio gratis · Sin tarjeta</p>
+            <p className="text-sm text-primary-foreground/60">{trialDays > 0 ? `${trialDays} días gratis · Sin tarjeta` : "Sin tarjeta"}</p>
           </div>
 
           {/* Mock del chat */}
@@ -196,39 +199,7 @@ export default async function LandingPage() {
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {plans.map((p) => (
-              <div
-                key={p.id}
-                className={cn(
-                  "relative flex flex-col rounded-2xl border bg-background p-6",
-                  p.highlighted ? "border-2 border-cta shadow-lg lg:-mt-4 lg:mb-4" : "border-border",
-                )}
-              >
-                {p.highlighted && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-cta px-3 py-1 text-xs font-bold text-cta-foreground">
-                    Más elegido
-                  </span>
-                )}
-                <h3 className="text-lg font-semibold">{p.name}</h3>
-                <p className="mt-3">
-                  <span className="font-heading text-4xl font-extrabold">${p.price_usd_month}</span>
-                  <span className="text-sm text-muted-foreground">/mes</span>
-                </p>
-                <p className="mt-1 text-sm font-medium">{p.teo_messages_month.toLocaleString("es-EC")} mensajes de Teo al mes</p>
-                <ul className="mt-6 flex-1 space-y-2 text-sm">
-                  <li className="flex gap-2"><CircleCheck className="mt-0.5 size-4 shrink-0 text-foreground" aria-hidden />{fmtLimit(p.max_users, "usuarios")}</li>
-                  <li className="flex gap-2"><CircleCheck className="mt-0.5 size-4 shrink-0 text-foreground" aria-hidden />{fmtLimit(p.max_stores, "tiendas")}</li>
-                  <li className="flex gap-2"><CircleCheck className="mt-0.5 size-4 shrink-0 text-foreground" aria-hidden />{fmtLimit(p.max_products, "productos")}</li>
-                  {p.features.filter((f) => FEATURE_LABELS[f] && f !== "sello_teo").map((f) => (
-                    <li key={f} className="flex gap-2"><CircleCheck className="mt-0.5 size-4 shrink-0 text-foreground" aria-hidden />{FEATURE_LABELS[f]}</li>
-                  ))}
-                </ul>
-                <Link
-                  href={`/registro?plan=${p.id}`}
-                  className={cn(buttonVariants({ variant: p.highlighted ? "cta" : "outline" }), "mt-6 h-11")}
-                >
-                  {p.price_usd_month === 0 ? "Empezar gratis" : "Probar 14 días gratis"}
-                </Link>
-              </div>
+              <PlanCard key={p.id} plan={p} trialDays={trialDays} />
             ))}
           </div>
           <p className="mt-8 text-center text-sm text-muted-foreground">

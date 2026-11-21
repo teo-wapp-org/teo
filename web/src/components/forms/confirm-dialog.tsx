@@ -13,6 +13,8 @@ export function ConfirmButton({
   confirmLabel = "Eliminar",
   onConfirm,
   disabled,
+  confirmVariant = "destructive",
+  children,
 }: {
   trigger: React.ReactElement;
   title: string;
@@ -20,6 +22,9 @@ export function ConfirmButton({
   confirmLabel?: string;
   onConfirm: () => Promise<boolean | void>;
   disabled?: boolean;
+  confirmVariant?: "destructive" | "default" | "cta";
+  /** Contenido extra dentro del diálogo (p. ej. un resumen de lo que va a cambiar). */
+  children?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
@@ -31,10 +36,11 @@ export function ConfirmButton({
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
+        {children}
         <DialogFooter>
           <DialogClose render={<Button variant="outline" />}>Cancelar</DialogClose>
           <Button
-            variant="destructive"
+            variant={confirmVariant}
             disabled={pending}
             onClick={() =>
               start(async () => {
