@@ -107,7 +107,7 @@ test("tiendas: crear una tienda con horario y verla en el inicio", async ({ owne
   await page.getByRole("link", { name: "Nueva tienda" }).click();
   await expect(page).toHaveURL(`/app/${owner.orgSlug}/tiendas/nueva`);
 
-  // Sin GOOGLE_PLACES_API_KEY en E2E el botón queda deshabilitado
+  // Según public_platform_config().places_available y el plan: deshabilitado o disponible
   await expect(page.getByRole("button", { name: /Disponible pronto|Buscar en Google/ })).toBeVisible();
 
   await page.getByLabel("Nombre", { exact: true }).fill("Matriz Norte");
